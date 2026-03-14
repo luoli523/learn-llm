@@ -13,7 +13,8 @@ parse:
 html:
   use_repository_button: true
   use_issues_button: true
+  baseurl: "/learn_llm"
 
 repository:
-  url: https://github.com/luoli/learn_llm
+  url: https://github.com/luoli523/learn_llm
   branch: main
