@@ -31,12 +31,10 @@ jobs:
           pip install -e .
 
       - name: Build book
-        run: |
-          python -m jupyter_book build . 2>&1
-          echo "Exit code: $?"
+        run: jupyter-book build .
 
       - name: Show build logs on failure
-        if: always()
+        if: failure()
         run: |
           echo "=== _build directory ==="
           ls -la _build/ 2>/dev/null || echo "_build/ not found"
