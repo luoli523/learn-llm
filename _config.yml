@@ -1,5 +1,5 @@
-title: Learn LLM
-author: li.luo
+title: 跟鬼哥一起学习LLM
+author: luoli
 
 exclude_patterns:
   - .venv
@@ -14,8 +14,17 @@ parse:
     - colon_fence
 
 html:
+  logo: _static/avatar.jpg
   use_repository_button: true
   use_issues_button: true
+  extra_css:
+    - _static/custom.css
+  extra_javascript:
+    - _static/custom.js
+
+sphinx:
+  config:
+    copyright: "2026"
 
 repository:
   url: https://github.com/luoli523/learn_llm
