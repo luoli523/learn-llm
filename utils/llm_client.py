@@ -53,7 +53,7 @@ def chat(
         max_tokens=max_tokens,
         **kwargs,
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content or ""
 
 
 def stream_chat(
@@ -106,7 +106,7 @@ def multi_turn_chat(
         max_tokens=max_tokens,
         **kwargs,
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content or ""
 
 
 def _build_messages(system: str | None, prompt: str) -> list[dict]:
