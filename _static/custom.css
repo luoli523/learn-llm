@@ -11,6 +11,15 @@
   box-shadow: 0 0 0 3px rgba(255,255,255,0.6);
 }
 
+/* ── Logo title text ── */
+.logo-title-text {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  color: inherit;
+}
+
 /* ── Avatar lightbox ── */
 #avatar-lightbox {
   display: none;

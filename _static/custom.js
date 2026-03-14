@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
     lightbox.addEventListener('click', function () {
       lightbox.style.display = 'none';
     });
+
+    // Re-inject title text (hidden by theme when html_logo is set)
+    var titleSpan = document.createElement('span');
+    titleSpan.className = 'logo-title-text';
+    titleSpan.textContent = '跟鬼哥一起学LLM';
+    logoImg.parentElement.appendChild(titleSpan);
   }
 
   // ── Floating video player ──
