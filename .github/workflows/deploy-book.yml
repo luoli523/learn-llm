@@ -31,13 +31,22 @@ jobs:
           pip install -e .
 
       - name: Build book
-        run: python -m jupyter_book build .
+        run: |
+          python -m jupyter_book build . 2>&1
+          echo "Exit code: $?"
+
+      - name: Show build logs on failure
+        if: always()
+        run: |
+          echo "=== _build directory ==="
+          ls -la _build/ 2>/dev/null || echo "_build/ not found"
+          echo "=== Build logs ==="
+          find _build/logs -name "*.log" -exec cat {} \; 2>/dev/null || echo "No logs found"
 
       - name: Verify output
         run: |
           if [ ! -d "_build/html" ]; then
-            echo "ERROR: _build/html not found. Build likely failed."
-            ls -la _build/ || echo "_build/ does not exist either."
+            echo "ERROR: _build/html not found."
             exit 1
           fi
           echo "Build output OK: $(find _build/html -name '*.html' | wc -l) HTML files"
