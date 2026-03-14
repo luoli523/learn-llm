@@ -1,0 +1,19 @@
+title: Learn LLM
+author: li.luo
+logo: ""
+
+execute:
+  execute_notebooks: "off"   # run notebooks manually; set to "auto" for CI
+
+parse:
+  myst_enable_extensions:
+    - colon_fence
+    - dollarmath
+
+html:
+  use_repository_button: true
+  use_issues_button: true
+
+repository:
+  url: https://github.com/luoli/learn_llm
+  branch: main

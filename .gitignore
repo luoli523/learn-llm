@@ -1,0 +1,10 @@
+.venv/
+.env
+_build/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+.DS_Store
+.ipython/

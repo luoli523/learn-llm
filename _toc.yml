@@ -1,0 +1,6 @@
+format: jb-book
+root: intro
+parts:
+  - caption: 环境配置 Setup
+    chapters:
+      - file: chapters/00_setup/verify

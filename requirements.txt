@@ -1,0 +1,11 @@
+# Multi-provider LLM interface
+litellm>=1.50.0
+python-dotenv>=1.0.0
+
+# Jupyter Book (static site generator)
+jupyter-book>=1.0.0
+ghp-import>=2.1.0
+
+# Notebooks
+jupyter>=1.0.0
+ipykernel>=6.29.0
