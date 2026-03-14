@@ -10,3 +10,6 @@ parts:
       - file: chapters/01_foundations/02_embeddings
       - file: chapters/01_foundations/03_context_window
       - file: chapters/01_foundations/04_sampling_params
+  - caption: Prompting 技术
+    chapters:
+      - file: chapters/02_prompting/01_zero_few_shot
