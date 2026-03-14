@@ -29,7 +29,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build book
-        run: jb build .
+        run: python -m jupyter_book build .
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
