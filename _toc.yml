@@ -9,3 +9,4 @@ parts:
       - file: chapters/01_foundations/01_tokens
       - file: chapters/01_foundations/02_embeddings
       - file: chapters/01_foundations/03_context_window
+      - file: chapters/01_foundations/04_sampling_params
