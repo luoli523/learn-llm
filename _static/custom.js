@@ -71,6 +71,30 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   document.addEventListener('mouseup', function () { drag.active = false; });
 
+  // ── Waline comments ──
+  var article = document.querySelector('.bd-article-container') || document.querySelector('article');
+  if (article) {
+    var walineDiv = document.createElement('div');
+    walineDiv.id = 'waline';
+    walineDiv.style.cssText = 'margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;';
+    article.appendChild(walineDiv);
+
+    var walineCSS = document.createElement('link');
+    walineCSS.rel = 'stylesheet';
+    walineCSS.href = 'https://unpkg.com/@waline/client@v3/dist/waline.css';
+    document.head.appendChild(walineCSS);
+
+    import('https://unpkg.com/@waline/client@v3/dist/waline.js').then(function (m) {
+      m.init({
+        el: '#waline',
+        serverURL: 'https://waline-server-amber.vercel.app',
+        lang: 'zh-CN',
+        pageview: true,
+        comment: true,
+      });
+    });
+  }
+
   // ── Music button in header ──
   var container = document.querySelector('.article-header-buttons');
   if (!container) return;
