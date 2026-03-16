@@ -46,6 +46,28 @@ learn_llm/
 
 **Adding a chapter**: create `chapters/NN_topic/title.ipynb`, then add it to `_toc.yml`.
 
+## Services & Infrastructure
+
+### 书籍网站
+- GitHub Pages: https://luoli523.github.io/learn_llm/
+- GitHub repo: https://github.com/luoli523/learn_llm
+
+### Waline 评论系统
+- Vercel 服务地址: https://waline-server-amber.vercel.app
+- Waline 管理后台: https://waline-server-amber.vercel.app/ui
+- GitHub repo: https://github.com/luoli523/waline-server
+
+### Supabase 数据库
+- Project ref: hceznobsksxpzmcvdjkn
+- Region: ap-south-1 (Transaction pooler)
+- Host: aws-1-ap-south-1.pooler.supabase.com, Port: 6543, DB: postgres
+- User: postgres.hceznobsksxpzmcvdjkn
+- ⚠️ 密码和 Token 存在本地 memory/project_services.md，不提交到 git
+
+### Telegram 通知
+- Bot: @Guige_AI_knowledge_bot (ID: 8681630743)
+- 新评论时自动推送到 bot owner 的 Telegram
+
 ## Working Guidelines
 
 1. Before writing any code, describe your approach and wait for approval.
