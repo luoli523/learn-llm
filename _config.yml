@@ -27,5 +27,5 @@ sphinx:
     html_logo: _static/avatar.jpg
 
 repository:
-  url: https://github.com/luoli523/learn_llm
+  url: https://github.com/luoli523/learn-llm
   branch: main

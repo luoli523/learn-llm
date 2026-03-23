@@ -26,7 +26,7 @@ ghp-import -n -p -f _build/html  # deploy to GitHub Pages
 ## Architecture
 
 ```
-learn_llm/
+learn-llm/
 ├── utils/llm_client.py     # unified multi-provider client (LiteLLM)
 ├── chapters/               # one subfolder per module, one .ipynb per concept
 │   └── 00_setup/verify.ipynb
@@ -49,8 +49,8 @@ learn_llm/
 ## Services & Infrastructure
 
 ### 书籍网站
-- GitHub Pages: https://luoli523.github.io/learn_llm/
-- GitHub repo: https://github.com/luoli523/learn_llm
+- GitHub Pages: https://luoli523.github.io/learn-llm/
+- GitHub repo: https://github.com/luoli523/learn-llm
 
 ### Waline 评论系统
 - Vercel 服务地址: https://waline-server-amber.vercel.app
