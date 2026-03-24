@@ -1,0 +1,1123 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>01 · Zero-shot &amp; Few-shot Prompting &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/02_prompting/01_zero_few_shot';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="02 · Chain-of-Thought Prompting" href="02_chain_of_thought.html" />
+    <link rel="prev" title="04 · Sampling Parameters" href="../01_foundations/04_sampling_params.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/02_prompting/01_zero_few_shot.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/02_prompting/01_zero_few_shot.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>01 · Zero-shot & Few-shot Prompting</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-prompting">1. Zero-shot Prompting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting">2. Few-shot Prompting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot">3. Few-shot 设计技巧</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1 例子数量的影响</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.2 例子顺序的影响</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3.3 例子质量 &gt; 例子数量</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 实战对比：三种任务</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">4.1 结构化数据提取</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.2 代码风格统一</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5. 进阶：动态 Few-shot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">小结</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="zero-shot-few-shot-prompting">
+<h1>01 · Zero-shot &amp; Few-shot Prompting<a class="headerlink" href="#zero-shot-few-shot-prompting" title="Link to this heading">#</a></h1>
+<p>提示词（Prompt）是你和 LLM 沟通的唯一方式。
+如何写 prompt 直接决定了模型输出的质量。</p>
+<p>最基础的两种方式：</p>
+<ul class="simple">
+<li><p><strong>Zero-shot</strong>：不给例子，直接说任务</p></li>
+<li><p><strong>Few-shot</strong>：给几个例子，让模型模仿</p></li>
+</ul>
+<p>听起来简单，但背后有值得深挖的原理，以及很多实用技巧。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">utils.llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span><span class="p">,</span> <span class="n">multi_turn_chat</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span><span class="n">zero_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">few_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;并排对比 zero-shot 和 few-shot 的输出。&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;任务: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Zero-shot]</span><span class="se">\n</span><span class="si">{</span><span class="n">chat</span><span class="p">(</span><span class="n">zero_prompt</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Few-shot]</span><span class="se">\n</span><span class="si">{</span><span class="n">chat</span><span class="p">(</span><span class="n">few_prompt</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="zero-shot-prompting">
+<h2>1. Zero-shot Prompting<a class="headerlink" href="#zero-shot-prompting" title="Link to this heading">#</a></h2>
+<p>Zero-shot 就是<strong>直接描述任务，不提供任何示例</strong>。
+大模型在训练时见过海量数据，很多任务不需要示例就能完成。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 情感分类 — zero-shot</span>
+<span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;这家餐厅的服务态度非常差，等了一个小时还没上菜，再也不会来了。&quot;</span>
+
+<span class="n">zero_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;判断以下评论的情感倾向，只回答「正面」或「负面」。</span>
+
+<span class="s2">评论：</span><span class="si">{</span><span class="n">text</span><span class="si">}</span>
+<span class="s2">情感：&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;评论: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Zero-shot 结果: </span><span class="si">{</span><span class="n">chat</span><span class="p">(</span><span class="n">zero_prompt</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>评论: 这家餐厅的服务态度非常差，等了一个小时还没上菜，再也不会来了。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Zero-shot 结果: 负面
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Zero-shot 的局限：输出格式不可控</span>
+<span class="n">texts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;产品质量很好，物超所值！&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;快递太慢了，包装也破损了。&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;还行吧，没有特别惊喜。&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;判断以下三条评论各自的情感，给出结果。</span>
+
+<span class="s2">1. 产品质量很好，物超所值！</span>
+<span class="s2">2. 快递太慢了，包装也破损了。</span>
+<span class="s2">3. 还行吧，没有特别惊喜。&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1. 积极/正面 — 产品质量好、物超所值，表达了满意和赞赏。  
+2. 消极/负面 — 抱怨快递慢且包装破损，表达不满。  
+3. 中性/中立 — 评价平淡、没有特别惊喜，既不强烈肯定也不强烈否定。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="few-shot-prompting">
+<h2>2. Few-shot Prompting<a class="headerlink" href="#few-shot-prompting" title="Link to this heading">#</a></h2>
+<p>Few-shot 在 prompt 里<strong>给几个输入-输出的例子</strong>，让模型学习：</p>
+<ul class="simple">
+<li><p>输出的<strong>格式</strong></p></li>
+<li><p>任务的<strong>边界</strong>（比如中性算正面还是负面）</p></li>
+<li><p>输出的<strong>风格</strong></p></li>
+</ul>
+<p>这种能力叫 <strong>In-context Learning（上下文学习）</strong>：
+模型不需要更新参数，仅凭 prompt 里的例子就能「学会」新任务。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 同样的情感分类，用 few-shot 精确控制输出格式</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sentiment_few_shot</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;判断评论情感。只回答「正面」「负面」或「中性」。</span>
+
+<span class="s2">评论：送货很快，产品和描述完全一致！</span>
+<span class="s2">情感：正面</span>
+
+<span class="s2">评论：质量太差了，买了两天就坏了。</span>
+<span class="s2">情感：负面</span>
+
+<span class="s2">评论：包装一般，产品还可以，说不上好也说不上坏。</span>
+<span class="s2">情感：中性</span>
+
+<span class="s2">评论：</span><span class="si">{</span><span class="n">text</span><span class="si">}</span>
+<span class="s2">情感：&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="n">test_cases</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;产品质量很好，物超所值！&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;快递太慢了，包装也破损了。&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;还行吧，没有特别惊喜。&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;这家餐厅的服务态度非常差，等了一个小时还没上菜。&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;总体来说符合预期，不会特别推荐也不会特别反对。&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;评论&#39;</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;情感&#39;</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">test_cases</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">sentiment_few_shot</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">result</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>评论                                 情感
+----------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>产品质量很好，物超所值！                       正面
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>快递太慢了，包装也破损了。                      负面
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>还行吧，没有特别惊喜。                        中性
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>这家餐厅的服务态度非常差，等了一个小时还没上菜。           负面
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>总体来说符合预期，不会特别推荐也不会特别反对。            中性
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="few-shot">
+<h2>3. Few-shot 设计技巧<a class="headerlink" href="#few-shot" title="Link to this heading">#</a></h2>
+<section id="id1">
+<h3>3.1 例子数量的影响<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 任务：把非正式中文转换成正式商务语言</span>
+<span class="n">test_input</span> <span class="o">=</span> <span class="s2">&quot;这个方案我觉得不咋地，改改再说吧。&quot;</span>
+
+<span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;这事儿我搞不定，你来吧。&quot;</span><span class="p">,</span>       <span class="s2">&quot;此事超出本人能力范围，建议由您处理。&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;开会时间推到下周呗，最近太忙了。&quot;</span><span class="p">,</span> <span class="s2">&quot;建议将会议时间顺延至下周，近期工作安排较为紧张。&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;这个预算根本不够用！&quot;</span><span class="p">,</span>             <span class="s2">&quot;现有预算难以满足项目需求，建议重新评估资源配置。&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_formal_prompt</span><span class="p">(</span><span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;将非正式中文转换成正式商务语言。</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="n">shots</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">informal</span><span class="p">,</span> <span class="n">formal</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[:</span><span class="n">n_examples</span><span class="p">]:</span>
+        <span class="n">shots</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;非正式：</span><span class="si">{</span><span class="n">informal</span><span class="si">}</span><span class="se">\n</span><span class="s2">正式：</span><span class="si">{</span><span class="n">formal</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">header</span> <span class="o">+</span> <span class="n">shots</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;非正式：</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="se">\n</span><span class="s2">正式：&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;输入: </span><span class="si">{</span><span class="n">test_input</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">make_formal_prompt</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">test_input</span><span class="p">),</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">-shot] </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>输入: 这个方案我觉得不咋地，改改再说吧。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0-shot] 正式：我对该方案目前的内容持保留意见，建议对方案进行修改后再提交讨论或实施。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[1-shot] 经评估，该方案尚不完善，建议先行修改后再行讨论与决策。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[2-shot] 正式：本人对该方案持保留意见，建议对方案进行修改完善后再行讨论。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[3-shot] 正式：对该方案本人持保留意见，建议先对方案进行修改完善后再行讨论或实施。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>3.2 例子顺序的影响<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>研究表明，<strong>最后一个例子对输出影响最大</strong>（Recency Bias）。
+把最具代表性的例子放在最后。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 验证 Recency Bias：最后一个例子的风格会被模仿</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_style_prompt</span><span class="p">(</span><span class="n">last_style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">styles</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;简洁&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;苹果&quot;</span><span class="p">,</span> <span class="s2">&quot;红色水果。&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;诗意&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;玫瑰&quot;</span><span class="p">,</span> <span class="s2">&quot;爱与美的化身，带刺的芬芳使者。&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;幽默&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;企鹅&quot;</span><span class="p">,</span> <span class="s2">&quot;穿着燕尾服却不会飞的社恐鸟类，天生的正式装扮爱好者。&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="c1"># 其他两种风格的例子放前面，目标风格放最后</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="s2">&quot;用一句话描述以下事物。</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">style</span><span class="p">,</span> <span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span> <span class="ow">in</span> <span class="n">styles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="n">last_style</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;事物：</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\n</span><span class="s2">描述：</span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="c1"># 目标风格放最后（Recency Bias）</span>
+    <span class="n">word</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">styles</span><span class="p">[</span><span class="n">last_style</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;事物：</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="se">\n</span><span class="s2">描述：</span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;事物：</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="se">\n</span><span class="s2">描述：&quot;</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+<span class="n">test_word</span> <span class="o">=</span> <span class="s2">&quot;月亮&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;描述对象: </span><span class="si">{</span><span class="n">test_word</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;简洁&quot;</span><span class="p">,</span> <span class="s2">&quot;诗意&quot;</span><span class="p">,</span> <span class="s2">&quot;幽默&quot;</span><span class="p">]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">make_style_prompt</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">test_word</span><span class="p">),</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[最后例子风格=</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>描述对象: 月亮
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[最后例子风格=简洁] 夜空的银盘，静静洒下柔光，照亮思念与梦境的温柔守望者。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[最后例子风格=诗意] 事物：月亮
+描述：夜空中银白的守望者，悄然牵动潮汐与人们的思念。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[最后例子风格=幽默] 夜空中孤独的银盘，静静照亮潮汐与人们的相思。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h3>3.3 例子质量 &gt; 例子数量<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p>一个精准的例子比三个模糊的例子更有效。例子应该：</p>
+<ul class="simple">
+<li><p><strong>覆盖边界情况</strong>（中性、模糊、特殊格式）</p></li>
+<li><p><strong>格式一致</strong>（输入/输出结构完全相同）</p></li>
+<li><p><strong>有代表性</strong>（不要都选最典型、最简单的案例）</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 对比：低质量 vs 高质量 few-shot 例子</span>
+<span class="n">ambiguous_input</span> <span class="o">=</span> <span class="s2">&quot;还行，比预期稍微好一点点。&quot;</span>
+
+<span class="c1"># 低质量：都是典型正/负面，没有覆盖边界</span>
+<span class="n">low_quality_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;判断情感（正面/负面/中性）。</span>
+
+<span class="s2">评论：太棒了，超级喜欢！</span>
+<span class="s2">情感：正面</span>
+
+<span class="s2">评论：非常失望，完全不值这个价。</span>
+<span class="s2">情感：负面</span>
+
+<span class="s2">评论：</span><span class="si">{</span><span class="n">ambiguous_input</span><span class="si">}</span>
+<span class="s2">情感：&quot;&quot;&quot;</span>
+
+<span class="c1"># 高质量：包含了边界案例（「比预期好一点」这种模糊情况）</span>
+<span class="n">high_quality_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;判断情感（正面/负面/中性）。</span>
+
+<span class="s2">评论：太棒了，超级喜欢！</span>
+<span class="s2">情感：正面</span>
+
+<span class="s2">评论：非常失望，完全不值这个价。</span>
+<span class="s2">情感：负面</span>
+
+<span class="s2">评论：本来以为会很差，实际还过得去，没有特别亮点。</span>
+<span class="s2">情感：中性</span>
+
+<span class="s2">评论：</span><span class="si">{</span><span class="n">ambiguous_input</span><span class="si">}</span>
+<span class="s2">情感：&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;模糊输入: </span><span class="si">{</span><span class="n">ambiguous_input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;低质量 few-shot: </span><span class="si">{</span><span class="n">chat</span><span class="p">(</span><span class="n">low_quality_prompt</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;高质量 few-shot: </span><span class="si">{</span><span class="n">chat</span><span class="p">(</span><span class="n">high_quality_prompt</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模糊输入: 还行，比预期稍微好一点点。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>低质量 few-shot: 情感：正面
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>高质量 few-shot: 情感：正面
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id4">
+<h2>4. 实战对比：三种任务<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<section id="id5">
+<h3>4.1 结构化数据提取<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 从自然语言中提取结构化信息</span>
+<span class="n">input_text</span> <span class="o">=</span> <span class="s2">&quot;请帮我约下周三下午3点和李总的会议，地点在B栋会议室，主题是Q4预算审核。&quot;</span>
+
+<span class="c1"># Zero-shot</span>
+<span class="n">zero</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;从以下文本中提取会议信息：</span><span class="se">\n\n</span><span class="si">{</span><span class="n">input_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Few-shot：用例子规定输出格式为 JSON</span>
+<span class="n">few</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;从文本中提取会议信息，以 JSON 格式输出。</span>
+
+<span class="s2">文本：下周一上午10点，和张总在A栋102室讨论新产品发布。</span>
+<span class="s2">JSON：</span><span class="se">{{</span><span class="s2">&quot;时间&quot;: &quot;下周一 10:00&quot;, &quot;参与者&quot;: &quot;张总&quot;, &quot;地点&quot;: &quot;A栋102室&quot;, &quot;主题&quot;: &quot;新产品发布&quot;</span><span class="se">}}</span>
+
+<span class="s2">文本：</span><span class="si">{</span><span class="n">input_text</span><span class="si">}</span>
+<span class="s2">JSON：&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Zero-shot 输出:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">zero</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Few-shot 输出:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">few</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Zero-shot 输出:
+提取结果（已将“下周三”按当前日期 2026-03-14 解析为 2026-03-18）：
+
+{
+  &quot;主题&quot;: &quot;Q4预算审核&quot;,
+  &quot;开始时间&quot;: &quot;2026-03-18T15:00&quot;,
+  &quot;结束时间&quot;: null,
+  &quot;时间原文&quot;: &quot;下周三下午3点&quot;,
+  &quot;与会人&quot;: [&quot;李总&quot;],
+  &quot;地点&quot;: &quot;B栋会议室&quot;,
+  &quot;原文&quot;: &quot;请帮我约下周三下午3点和李总的会议，地点在B栋会议室，主题是Q4预算审核。&quot;
+}
+
+注：若“下周三”需按其他日期规则解释或需指定会议时长/提醒，请告知。
+
+Few-shot 输出:
+{&quot;时间&quot;: &quot;下周三 15:00&quot;, &quot;参与者&quot;: &quot;李总&quot;, &quot;地点&quot;: &quot;B栋会议室&quot;, &quot;主题&quot;: &quot;Q4预算审核&quot;}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h3>4.2 代码风格统一<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 把不同风格的变量名统一成 snake_case</span>
+<span class="n">messy_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">firstName = &quot;Alice&quot;</span>
+<span class="s2">LastName = &quot;Smith&quot;</span>
+<span class="s2">userAGE = 30</span>
+<span class="s2">IsActive = True</span>
+<span class="s2">maxRetryCount = 3</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;将变量名统一改为 snake_case 风格，保持值不变，只改变量名。</span>
+
+<span class="s2">输入：</span>
+<span class="s2">userName = &quot;Bob&quot;</span>
+<span class="s2">userAge = 25</span>
+<span class="s2">IsAdmin = False</span>
+
+<span class="s2">输出：</span>
+<span class="s2">user_name = &quot;Bob&quot;</span>
+<span class="s2">user_age = 25</span>
+<span class="s2">is_admin = False</span>
+
+<span class="s2">输入：</span><span class="si">{</span><span class="n">messy_code</span><span class="si">}</span>
+<span class="s2">输出：&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">few_shot_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>first_name = &quot;Alice&quot;
+last_name = &quot;Smith&quot;
+user_age = 30
+is_active = True
+max_retry_count = 3
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id7">
+<h2>5. 进阶：动态 Few-shot<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>固定 few-shot 例子不一定是最优的——当输入多样时，
+<strong>从例子库中动态选最相关的例子</strong>效果更好。</p>
+<p>原理：用 embedding 找和当前输入最相似的例子（借用 Chapter 02 的语义搜索）。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;openai/text-embedding-3-small&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="n">text</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;embedding&quot;</span><span class="p">])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cosine_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+
+<span class="c1"># 例子库：(输入, 期望输出)</span>
+<span class="n">example_bank</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;苹果手机信号不好&quot;</span><span class="p">,</span>         <span class="s2">&quot;产品质量问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;快递三天没到&quot;</span><span class="p">,</span>             <span class="s2">&quot;物流问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;客服电话一直没人接&quot;</span><span class="p">,</span>        <span class="s2">&quot;售后服务问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;颜色和图片不一样&quot;</span><span class="p">,</span>          <span class="s2">&quot;描述不符问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;包装盒破损，里面产品完好&quot;</span><span class="p">,</span>   <span class="s2">&quot;包装问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;收到货少了一件&quot;</span><span class="p">,</span>            <span class="s2">&quot;发货问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;充电器插头做工粗糙&quot;</span><span class="p">,</span>        <span class="s2">&quot;产品质量问题&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;退款申请三天没处理&quot;</span><span class="p">,</span>        <span class="s2">&quot;售后服务问题&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># 预计算所有例子的 embedding</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;预计算例子 embeddings...&quot;</span><span class="p">)</span>
+<span class="n">bank_embeddings</span> <span class="o">=</span> <span class="p">[(</span><span class="n">get_embedding</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">inp</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span><span class="p">,</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">example_bank</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;完成，共 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bank_embeddings</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个例子&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>预计算例子 embeddings...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>完成，共 8 个例子
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">dynamic_few_shot_classify</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;动态选择最相关的例子做 few-shot 分类。&quot;&quot;&quot;</span>
+    <span class="n">query_emb</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># 找最相似的 n 个例子</span>
+    <span class="n">scored</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">cosine_similarity</span><span class="p">(</span><span class="n">query_emb</span><span class="p">,</span> <span class="n">emb</span><span class="p">),</span> <span class="n">inp</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">emb</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">bank_embeddings</span>
+        <span class="k">if</span> <span class="n">inp</span> <span class="o">!=</span> <span class="n">query</span>  <span class="c1"># 排除自身</span>
+    <span class="p">]</span>
+    <span class="n">scored</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">top_examples</span> <span class="o">=</span> <span class="n">scored</span><span class="p">[:</span><span class="n">n_examples</span><span class="p">]</span>
+
+    <span class="c1"># 构建 few-shot prompt</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;将用户投诉分类到以下类别之一：产品质量问题/物流问题/售后服务问题/描述不符问题/包装问题/发货问题。</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">top_examples</span><span class="p">:</span>
+        <span class="n">prompt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;投诉：</span><span class="si">{</span><span class="n">inp</span><span class="si">}</span><span class="se">\n</span><span class="s2">类别：</span><span class="si">{</span><span class="n">out</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="n">prompt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;投诉：</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="s2">类别：&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  选用例子: </span><span class="si">{</span><span class="p">[</span><span class="n">inp</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">inp</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">top_examples</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="c1"># 测试</span>
+<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;屏幕有划痕，明显是质检没过关&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;已经等了五天了快递还没动静&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;联系了客服两次都没有回音&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;投诉&#39;</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;分类&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">42</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">投诉: </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">dynamic_few_shot_classify</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  分类: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>投诉                                  分类
+------------------------------------------
+
+投诉: 屏幕有划痕，明显是质检没过关
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  选用例子: [&#39;包装盒破损，里面产品完好&#39;, &#39;充电器插头做工粗糙&#39;, &#39;颜色和图片不一样&#39;]
+  分类: 类别：产品质量问题
+
+投诉: 已经等了五天了快递还没动静
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  选用例子: [&#39;快递三天没到&#39;, &#39;退款申请三天没处理&#39;, &#39;客服电话一直没人接&#39;]
+  分类: 类别：物流问题
+
+投诉: 联系了客服两次都没有回音
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  选用例子: [&#39;客服电话一直没人接&#39;, &#39;退款申请三天没处理&#39;, &#39;快递三天没到&#39;]
+  分类: 类别：售后服务问题
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id8">
+<h2>小结<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>技术</p></th>
+<th class="head"><p>核心思路</p></th>
+<th class="head"><p>适用场景</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Zero-shot</p></td>
+<td><p>直接描述任务</p></td>
+<td><p>简单、通用任务；快速原型</p></td>
+</tr>
+<tr class="row-odd"><td><p>Few-shot</p></td>
+<td><p>给例子引导格式和边界</p></td>
+<td><p>需要精确格式；有特定边界定义</p></td>
+</tr>
+<tr class="row-even"><td><p>动态 Few-shot</p></td>
+<td><p>用 embedding 自动选相关例子</p></td>
+<td><p>输入多样，例子库大</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Few-shot 设计要点：</strong></p>
+<ol class="arabic simple">
+<li><p>格式绝对一致（结构上的对称让模型更容易模仿）</p></li>
+<li><p>覆盖边界情况（不要只放典型案例）</p></li>
+<li><p>最后一个例子影响最大（Recency Bias）</p></li>
+<li><p>质量 &gt; 数量（3 个精准 &gt; 10 个模糊）</p></li>
+</ol>
+<p><strong>下一章 →</strong> <a class="reference internal" href="02_chain_of_thought.html"><span class="std std-doc">Chain-of-Thought</span></a>：让模型「先思考再回答」，大幅提升推理能力</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/02_prompting"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../01_foundations/04_sampling_params.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">04 · Sampling Parameters</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_chain_of_thought.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">02 · Chain-of-Thought Prompting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-prompting">1. Zero-shot Prompting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting">2. Few-shot Prompting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot">3. Few-shot 设计技巧</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1 例子数量的影响</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.2 例子顺序的影响</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3.3 例子质量 &gt; 例子数量</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 实战对比：三种任务</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">4.1 结构化数据提取</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.2 代码风格统一</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5. 进阶：动态 Few-shot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">小结</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

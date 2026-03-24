@@ -1,0 +1,1493 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>完整 RAG 系统：端到端实战 &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04_rag/04_end_to_end';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ReAct 模式：推理 + 行动" href="../05_agents/01_react.html" />
+    <link rel="prev" title="向量数据库：ChromaDB 实战" href="03_vector_db.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/04_rag/04_end_to_end.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/04_rag/04_end_to_end.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>完整 RAG 系统：端到端实战</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">核心辅助函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">第一节：构建知识库</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">第二节：RAG 检索函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">第三节：RAG 生成函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">第四节：完整问答演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">第五节：评估检索质量</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rag-vs-llm">第六节：RAG vs 直接问 LLM</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">总结</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">完整 RAG 流水线图</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">本章核心代码结构</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">下一步优化方向</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="rag">
+<h1>完整 RAG 系统：端到端实战<a class="headerlink" href="#rag" title="Link to this heading">#</a></h1>
+<p>经过前三章的学习，我们掌握了 RAG 系统的所有零件：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>章节</p></th>
+<th class="head"><p>技术</p></th>
+<th class="head"><p>作用</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>第一章</p></td>
+<td><p>文档加载与切块</p></td>
+<td><p>把长文档切成合适大小的片段</p></td>
+</tr>
+<tr class="row-odd"><td><p>第二章</p></td>
+<td><p>Embedding</p></td>
+<td><p>把文本转成向量，捕获语义</p></td>
+</tr>
+<tr class="row-even"><td><p>第三章</p></td>
+<td><p>ChromaDB</p></td>
+<td><p>持久化存储向量，高效检索</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>本章把这三项技术组合成完整的 RAG 系统</strong>：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>文档语料库
+    │
+    ▼ chunk_text()
+文本片段（chunks）
+    │
+    ▼ get_embeddings()
+向量（embeddings）
+    │
+    ▼ collection.add()
+ChromaDB 向量库
+    │        ▲
+    │        │ retrieve(query)
+    ▼        │
+相关片段（context）
+    │
+    ▼ rag_answer(question)
+LLM 生成回答
+</pre></div>
+</div>
+<p>完成本章后，你将拥有一个<strong>可直接用于生产</strong>的 RAG 骨架代码。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">chromadb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">drop_params</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">)</span>
+<span class="n">EMBED_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;EMBED_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;openai/text-embedding-3-small&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM 模型:       </span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Embedding 模型: </span><span class="si">{</span><span class="n">EMBED_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># gpt-5/o系列不支持自定义temperature值，统一用安全wrapper</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_c</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">_m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openai/gpt-5&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o1&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o3&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o4&#39;</span><span class="p">)):</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LLM 模型:       openai/gpt-5-mini
+Embedding 模型: openai/text-embedding-3-small
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id1">
+<h2>核心辅助函数<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>三个关键函数构成 RAG 的基础工具箱：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_embedding</span></code>：单条文本向量化</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_embeddings</span></code>：批量向量化（效率更高）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunk_text</span></code>：带重叠的滑动窗口切块</p></li>
+</ul>
+<p><strong>为什么需要重叠（overlap）？</strong><br />
+切块边界处的句子可能被截断，重叠区域确保边界信息不丢失。<br />
+例如 size=300、overlap=50 时，相邻两块共享 50 个字符。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;获取单条文本的 embedding 向量。&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">EMBED_MODEL</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="n">text</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;embedding&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_embeddings</span><span class="p">(</span><span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;批量获取 embedding，按 index 排序保证顺序一致。&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">EMBED_MODEL</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">texts</span><span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">chunk_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">overlap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;滑动窗口切块，带重叠区域。</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        text: 原始文本</span>
+<span class="sd">        size: 每块最大字符数</span>
+<span class="sd">        overlap: 相邻块重叠字符数</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        切块列表</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">size</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">overlap</span>  <span class="c1"># 每次前进的步长</span>
+    
+    <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">chunk</span><span class="p">:</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="n">start</span> <span class="o">+=</span> <span class="n">step</span>
+    
+    <span class="k">return</span> <span class="n">chunks</span>
+
+
+<span class="c1"># 验证 chunk_text</span>
+<span class="n">test_text</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span> <span class="o">*</span> <span class="mi">650</span>  <span class="c1"># 650 个字符的测试文本</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="n">chunk_text</span><span class="p">(</span><span class="n">test_text</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;原文长度: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test_text</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;切块数量: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;各块长度: </span><span class="si">{</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">chunks</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;重叠验证: 块0末尾50字符 == 块1开头50字符: </span><span class="si">{</span><span class="n">chunks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">50</span><span class="p">:]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">chunks</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>原文长度: 650 字符
+切块数量: 3
+各块长度: [300, 300, 150]
+重叠验证: 块0末尾50字符 == 块1开头50字符: True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2>第一节：构建知识库<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>我们定义一个包含 5 篇中文文档的语料库，主题涵盖 LLM 核心概念。</p>
+<p>构建流程：</p>
+<ol class="arabic simple">
+<li><p>对每篇文档调用 <code class="docutils literal notranslate"><span class="pre">chunk_text</span></code> 切块</p></li>
+<li><p>批量获取所有块的 embedding</p></li>
+<li><p>存入 ChromaDB，附带 <code class="docutils literal notranslate"><span class="pre">doc_id</span></code>、<code class="docutils literal notranslate"><span class="pre">chunk_id</span></code>、<code class="docutils literal notranslate"><span class="pre">source</span></code> 元数据</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 定义语料库：5 篇关于 LLM 的中文文档</span>
+<span class="n">CORPUS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_001&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;LLM基础教材&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;大语言模型（Large Language Model，LLM）是基于 Transformer 架构的深度学习模型，&quot;</span>
+            <span class="s2">&quot;通过在海量文本数据上进行预训练来学习语言规律。GPT 系列、Claude、Gemini 是当前最&quot;</span>
+            <span class="s2">&quot;具代表性的大语言模型。这些模型参数量从数十亿到数千亿不等，训练数据来自互联网、书&quot;</span>
+            <span class="s2">&quot;籍、代码等多种来源。预训练完成后，通过指令微调（Instruction Tuning）和人类反馈强&quot;</span>
+            <span class="s2">&quot;化学习（RLHF）使模型更好地遵循人类指令。大语言模型的核心能力包括文本生成、问答、&quot;</span>
+            <span class="s2">&quot;摘要、翻译、代码编写等，在众多自然语言处理任务上达到甚至超越人类水平。&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_002&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;RAG技术报告&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;检索增强生成（Retrieval-Augmented Generation，RAG）是一种将信息检索与文本生成结&quot;</span>
+            <span class="s2">&quot;合的技术框架。RAG 的核心思想是：在回答问题时，先从外部知识库中检索相关信息，再将&quot;</span>
+            <span class="s2">&quot;检索到的内容作为上下文提供给语言模型，从而生成更准确、更有依据的回答。RAG 解决了&quot;</span>
+            <span class="s2">&quot;纯 LLM 的三大痛点：知识截止日期（训练数据有时效性）、幻觉问题（模型可能编造事实）&quot;</span>
+            <span class="s2">&quot;、领域知识不足（通用模型缺乏专业知识）。典型的 RAG 流程分为离线索引阶段和在线推理&quot;</span>
+            <span class="s2">&quot;阶段。离线阶段将文档切块、向量化并存入向量数据库；在线阶段将用户问题向量化，检索&quot;</span>
+            <span class="s2">&quot;最相关的文档块，拼接到提示词中让 LLM 生成回答。&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_003&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;Transformer论文解读&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Transformer 是 2017 年 Google 在论文《Attention is All You Need》中提出的神经&quot;</span>
+            <span class="s2">&quot;网络架构。其核心创新是自注意力机制（Self-Attention），允许模型在处理序列中的每个&quot;</span>
+            <span class="s2">&quot;位置时关注序列中所有其他位置，从而捕获长距离依赖关系。Transformer 由编码器&quot;</span>
+            <span class="s2">&quot;（Encoder）和解码器（Decoder）组成。编码器将输入序列映射到连续表示，解码器根据&quot;</span>
+            <span class="s2">&quot;编码器输出和已生成的词元逐步生成输出序列。多头注意力机制（Multi-Head Attention）&quot;</span>
+            <span class="s2">&quot;让模型从不同角度理解输入，前馈网络（FFN）负责非线性变换，残差连接和层归一化保证&quot;</span>
+            <span class="s2">&quot;训练稳定性。BERT 使用编码器结构，GPT 使用解码器结构，T5 使用完整的编解码器结构。&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_004&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;Embedding技术综述&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;文本嵌入（Text Embedding）是将文本转换为高维向量的技术，使语义相近的文本在向量&quot;</span>
+            <span class="s2">&quot;空间中距离相近。现代 Embedding 模型通常基于预训练语言模型微调而来，如 OpenAI 的&quot;</span>
+            <span class="s2">&quot;text-embedding-3-small、Cohere 的 embed-multilingual 等。Embedding 的质量直接&quot;</span>
+            <span class="s2">&quot;影响 RAG 系统的检索效果。常用相似度指标有余弦相似度（Cosine Similarity）和欧氏&quot;</span>
+            <span class="s2">&quot;距离（Euclidean Distance）。余弦相似度关注向量方向而非长度，在文本检索中更常用。&quot;</span>
+            <span class="s2">&quot;Embedding 维度通常在 384 到 3072 之间，维度越高表达能力越强，但计算和存储开销&quot;</span>
+            <span class="s2">&quot;也越大。批量获取 Embedding 比逐条获取效率更高，生产环境应充分利用批量 API。&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_005&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;提示词工程指南&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;提示词工程（Prompt Engineering）是设计和优化输入提示以引导大语言模型产生期望输出&quot;</span>
+            <span class="s2">&quot;的技术。良好的提示词设计对模型性能有显著影响。常见技巧包括：少样本提示（Few-Shot &quot;</span>
+            <span class="s2">&quot;Prompting）通过提供示例引导模型理解任务格式；思维链提示（Chain-of-Thought）让模&quot;</span>
+            <span class="s2">&quot;型逐步推理，提升复杂问题解决能力；角色扮演提示通过赋予模型特定角色改变回答风格。&quot;</span>
+            <span class="s2">&quot;在 RAG 场景中，系统提示词通常要求模型：仅根据提供的上下文回答，不要编造信息，无&quot;</span>
+            <span class="s2">&quot;法从上下文中找到答案时明确告知用户。结构化输出提示可以让模型返回 JSON、表格等&quot;</span>
+            <span class="s2">&quot;格式化数据，方便程序进一步处理。&quot;</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;语料库文档数: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">CORPUS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">CORPUS</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;doc_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] - </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>语料库文档数: 5
+  doc_001 [LLM基础教材] - 271 字符
+  doc_002 [RAG技术报告] - 292 字符
+  doc_003 [Transformer论文解读] - 337 字符
+  doc_004 [Embedding技术综述] - 356 字符
+  doc_005 [提示词工程指南] - 285 字符
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 切块 + 向量化 + 存入 ChromaDB</span>
+<span class="n">kb_client</span> <span class="o">=</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+<span class="n">kb_collection</span> <span class="o">=</span> <span class="n">kb_client</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;llm_knowledge_base&quot;</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hnsw:space&quot;</span><span class="p">:</span> <span class="s2">&quot;cosine&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">all_chunks</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># 所有文本块</span>
+<span class="n">all_chunk_ids</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># 每块的唯一 ID</span>
+<span class="n">all_metadatas</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># 每块的元数据</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;── 切块结果 ──&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">CORPUS</span><span class="p">:</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunk_text</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;doc_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> 字 → </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="si">}</span><span class="s2"> 块&quot;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">chunk_idx</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+        <span class="n">chunk_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;doc_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_chunk_</span><span class="si">{</span><span class="n">chunk_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">all_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">all_chunk_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">)</span>
+        <span class="n">all_metadatas</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;doc_id&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;doc_id&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;chunk_id&quot;</span><span class="p">:</span> <span class="n">chunk_idx</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span>
+        <span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">总计 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_chunks</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个文本块&quot;</span><span class="p">)</span>
+
+<span class="c1"># 批量获取 embedding</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;正在批量获取 embedding...&quot;</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+<span class="n">all_embeddings</span> <span class="o">=</span> <span class="n">get_embeddings</span><span class="p">(</span><span class="n">all_chunks</span><span class="p">)</span>
+<span class="n">t_embed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Embedding 完成，耗时 </span><span class="si">{</span><span class="n">t_embed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+
+<span class="c1"># 存入 ChromaDB</span>
+<span class="n">kb_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">ids</span><span class="o">=</span><span class="n">all_chunk_ids</span><span class="p">,</span>
+    <span class="n">embeddings</span><span class="o">=</span><span class="n">all_embeddings</span><span class="p">,</span>
+    <span class="n">documents</span><span class="o">=</span><span class="n">all_chunks</span><span class="p">,</span>
+    <span class="n">metadatas</span><span class="o">=</span><span class="n">all_metadatas</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;知识库构建完成，共 </span><span class="si">{</span><span class="n">kb_collection</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2"> 条记录&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>── 切块结果 ──
+  doc_001: 271 字 → 2 块
+  doc_002: 292 字 → 2 块
+  doc_003: 337 字 → 2 块
+  doc_004: 356 字 → 2 块
+  doc_005: 285 字 → 2 块
+
+总计 10 个文本块
+正在批量获取 embedding...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Embedding 完成，耗时 0.55s
+知识库构建完成，共 10 条记录
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2>第二节：RAG 检索函数<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">retrieve</span></code> 函数是 RAG 系统的「大脑」：给定用户问题，从向量库中找出最相关的文档块。</p>
+<p>返回格式统一为字典列表，每项包含：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>：文档块原文</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code>：来源信息（doc_id、source 等）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distance</span></code>：余弦距离（越小越相关）</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">collection</span><span class="p">:</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">Collection</span><span class="p">,</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">where</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从向量库中检索与 query 最相关的文档块。</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        query: 用户查询文本</span>
+<span class="sd">        collection: ChromaDB collection</span>
+<span class="sd">        top_k: 返回最相关的前 k 条</span>
+<span class="sd">        where: 可选的元数据过滤条件</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list of {text, metadata, distance}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;query_embeddings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">query_embedding</span><span class="p">],</span>
+        <span class="s2">&quot;n_results&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">top_k</span><span class="p">,</span> <span class="n">collection</span><span class="o">.</span><span class="n">count</span><span class="p">()),</span>
+        <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">,</span> <span class="s2">&quot;metadatas&quot;</span><span class="p">,</span> <span class="s2">&quot;distances&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;where&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">where</span>
+    
+    <span class="n">results</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="p">,</span>
+            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">,</span>
+            <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">dist</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">doc</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;metadatas&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># 示例检索</span>
+<span class="n">example_query</span> <span class="o">=</span> <span class="s2">&quot;Transformer 的自注意力机制是什么？&quot;</span>
+<span class="n">retrieved</span> <span class="o">=</span> <span class="n">retrieve</span><span class="p">(</span><span class="n">example_query</span><span class="p">,</span> <span class="n">kb_collection</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;查询: </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">example_query</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">retrieved</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] 来源: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">  距离: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][:</span><span class="mi">80</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: &quot;Transformer 的自注意力机制是什么？&quot;
+=================================================================
+
+[1] 来源: Transformer论文解读  距离: 0.4184
+    Transformer 是 2017 年 Google 在论文《Attention is All You Need》中提出的神经网络架构。其核心创新是自注意力机...
+
+[2] 来源: Transformer论文解读  距离: 0.5568
+    er）和解码器（Decoder）组成。编码器将输入序列映射到连续表示，解码器根据编码器输出和已生成的词元逐步生成输出序列。多头注意力机制（Multi-Head ...
+
+[3] 来源: 提示词工程指南  距离: 0.6744
+    提示词工程（Prompt Engineering）是设计和优化输入提示以引导大语言模型产生期望输出的技术。良好的提示词设计对模型性能有显著影响。常见技巧包括：少...
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>第三节：RAG 生成函数<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rag_answer</span></code> 函数串联检索与生成：</p>
+<ol class="arabic simple">
+<li><p>调用 <code class="docutils literal notranslate"><span class="pre">retrieve</span></code> 获取相关文档块</p></li>
+<li><p>将文档块拼接成「上下文」</p></li>
+<li><p>构建系统提示词，要求模型只根据上下文回答</p></li>
+<li><p>调用 LLM 生成最终答案</p></li>
+</ol>
+<p>系统提示词的关键设计：<strong>明确告知模型知识边界</strong>——上下文中没有的信息不要编造。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;你是知识库助手，只根据提供的上下文回答用户问题。</span>
+
+<span class="s2">规则：</span>
+<span class="s2">1. 只使用「上下文」中的信息回答，不要添加上下文中没有的内容</span>
+<span class="s2">2. 如果上下文中没有足够信息，直接回答「根据现有知识库，我无法回答这个问题」</span>
+<span class="s2">3. 回答要简洁准确，引用具体信息时可以提及来源</span>
+<span class="s2">4. 不要编造数据、引用或事实&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rag_answer</span><span class="p">(</span>
+    <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">collection</span><span class="p">:</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">Collection</span><span class="p">,</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;完整的 RAG 问答流程：检索 → 构建提示 → 生成答案。</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        question: 用户问题</span>
+<span class="sd">        collection: 知识库 ChromaDB collection</span>
+<span class="sd">        top_k: 检索文档块数量</span>
+<span class="sd">        verbose: 是否打印完整提示词</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        LLM 生成的回答</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 步骤 1：检索相关文档块</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">retrieve</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+    
+    <span class="c1"># 步骤 2：构建上下文</span>
+    <span class="n">context_parts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+        <span class="n">context_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[文档</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> - 来源：</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="si">{</span><span class="n">chunk</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">context_parts</span><span class="p">)</span>
+    
+    <span class="c1"># 步骤 3：构建用户消息</span>
+    <span class="n">user_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;上下文：</span>
+<span class="si">{</span><span class="n">context</span><span class="si">}</span>
+
+<span class="s2">问题：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;── 完整提示词 ──&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[系统提示]</span><span class="se">\n</span><span class="si">{</span><span class="n">SYSTEM_PROMPT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[用户消息]</span><span class="se">\n</span><span class="si">{</span><span class="n">user_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;─&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    
+    <span class="c1"># 步骤 4：调用 LLM</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">SYSTEM_PROMPT</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">user_message</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># 低温度确保回答稳定、忠实于上下文</span>
+    <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+
+<span class="c1"># 演示：打印完整提示词</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;演示完整 RAG 提示词结构（第一次调用显示详情）&quot;</span><span class="p">)</span>
+<span class="n">demo_answer</span> <span class="o">=</span> <span class="n">rag_answer</span><span class="p">(</span>
+    <span class="s2">&quot;RAG 解决了哪些 LLM 的痛点？&quot;</span><span class="p">,</span>
+    <span class="n">kb_collection</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">── 模型回答 ──&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">demo_answer</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>演示完整 RAG 提示词结构（第一次调用显示详情）
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>── 完整提示词 ──
+[系统提示]
+你是知识库助手，只根据提供的上下文回答用户问题。
+
+规则：
+1. 只使用「上下文」中的信息回答，不要添加上下文中没有的内容
+2. 如果上下文中没有足够信息，直接回答「根据现有知识库，我无法回答这个问题」
+3. 回答要简洁准确，引用具体信息时可以提及来源
+4. 不要编造数据、引用或事实
+
+[用户消息]
+上下文：
+[文档1 - 来源：RAG技术报告]
+练数据有时效性）、幻觉问题（模型可能编造事实）、领域知识不足（通用模型缺乏专业知识）。典型的 RAG 流程分为离线索引阶段和在线推理阶段。离线阶段将文档切块、向量化并存入向量数据库；在线阶段将用户问题向量化，检索最相关的文档块，拼接到提示词中让 LLM 生成回答。
+
+[文档2 - 来源：RAG技术报告]
+检索增强生成（Retrieval-Augmented Generation，RAG）是一种将信息检索与文本生成结合的技术框架。RAG 的核心思想是：在回答问题时，先从外部知识库中检索相关信息，再将检索到的内容作为上下文提供给语言模型，从而生成更准确、更有依据的回答。RAG 解决了纯 LLM 的三大痛点：知识截止日期（训练数据有时效性）、幻觉问题（模型可能编造事实）、领域知识不足（通用模型缺乏专业知
+
+[文档3 - 来源：Embedding技术综述]
+量直接影响 RAG 系统的检索效果。常用相似度指标有余弦相似度（Cosine Similarity）和欧氏距离（Euclidean Distance）。余弦相似度关注向量方向而非长度，在文本检索中更常用。Embedding 维度通常在 384 到 3072 之间，维度越高表达能力越强，但计算和存储开销也越大。批量获取 Embedding 比逐条获取效率更高，生产环境应充分利用批量 API。
+
+问题：RAG 解决了哪些 LLM 的痛点？
+──────────────────────────────────────────────────
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>── 模型回答 ──
+RAG 解决三大痛点：知识截止日期（训练数据有时效性）、幻觉问题（模型可能编造事实）、领域知识不足（通用模型缺乏专业知识）。（来源：RAG技术报告，文档1/文档2）
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>第四节：完整问答演示<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>用三类问题测试 RAG 系统的边界：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>类型</p></th>
+<th class="head"><p>预期行为</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>知识库中有明确答案</p></td>
+<td><p>准确回答，引用相关文档</p></td>
+</tr>
+<tr class="row-odd"><td><p>知识库中有部分相关信息</p></td>
+<td><p>基于已有信息作答，不过度延伸</p></td>
+</tr>
+<tr class="row-even"><td><p>知识库中完全没有相关信息</p></td>
+<td><p>明确告知无法回答，不编造</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_questions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;Transformer 架构是由谁提出的？主要创新是什么？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;完全可回答&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="s2">&quot;知识库 doc_003 有详细介绍&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;提示词工程在 RAG 中如何应用？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;部分可回答&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_005 有提示词工程，doc_002 有 RAG，但两者结合的内容有限&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;2024 年诺贝尔物理学奖得主是谁？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;完全不可回答&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="s2">&quot;知识库完全没有诺贝尔奖相关内容&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_questions</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">65</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;问题 </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;备注: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;note&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+    
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">rag_answer</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">],</span> <span class="n">kb_collection</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A: </span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">65</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=================================================================
+问题 1 [完全可回答]
+Q: Transformer 架构是由谁提出的？主要创新是什么？
+备注: 知识库 doc_003 有详细介绍
+-----------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A: Transformer 由 Google 在 2017 年的论文《Attention is All You Need》提出（见文档1）。其主要创新是自注意力机制（Self-Attention），允许模型在处理序列中每个位置时关注序列中所有其他位置，进而捕获长距离依赖关系（见文档1）。
+
+=================================================================
+问题 2 [部分可回答]
+Q: 提示词工程在 RAG 中如何应用？
+备注: doc_005 有提示词工程，doc_002 有 RAG，但两者结合的内容有限
+-----------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A: 简要回答（仅基于提供的上下文）：
+
+- 在 RAG 流程中，首先离线将文档切块并向量化，在线将用户问题向量化并检索最相关的文档块，然后将检索到的文档拼接到提示词中交给 LLM 生成回答（参见：文档2）。  
+- 提示词工程的常见手段（少样本提示、思维链提示、角色扮演提示等）用于设计和优化这些拼接后的提示，以引导模型按照期望的格式、推理步骤和风格输出（参见：文档1）。  
+- 结合以上，RAG 的核心是把外部检索到的信息作为上下文提供给模型，提示词工程则负责如何组织、示例化和指引这些上下文，从而帮助解决知识时效、幻觉和领域知识不足等问题（参见：文档3；文档2 提到的相关痛点）。
+
+=================================================================
+问题 3 [完全不可回答]
+Q: 2024 年诺贝尔物理学奖得主是谁？
+备注: 知识库完全没有诺贝尔奖相关内容
+-----------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A: 根据现有知识库，我无法回答这个问题
+
+=================================================================
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2>第五节：评估检索质量<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>RAG 系统的质量取决于两个环节：<strong>检索质量</strong>和<strong>生成质量</strong>。</p>
+<p>本节聚焦检索质量评估，使用 <strong>Recall&#64;K</strong> 指标：</p>
+<p>$$\text{Recall&#64;K} = \frac{\text{Top-K 结果中包含正确文档的查询数}}{\text{总查询数}}$$</p>
+<p>Recall&#64;3 = 0.8 表示 80% 的查询，正确答案文档出现在前 3 个检索结果中。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_retrieval</span><span class="p">(</span>
+    <span class="n">test_cases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">collection</span><span class="p">:</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">Collection</span><span class="p">,</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;评估检索质量，计算 Recall@K。</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        test_cases: list of {question, expected_doc_id}</span>
+<span class="sd">        collection: 知识库 collection</span>
+<span class="sd">        top_k: 评估 Recall@K</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        {recall_at_k, details}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">details</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">hit_count</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">test_cases</span><span class="p">:</span>
+        <span class="n">question</span> <span class="o">=</span> <span class="n">case</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span>
+        <span class="n">expected_doc_id</span> <span class="o">=</span> <span class="n">case</span><span class="p">[</span><span class="s2">&quot;expected_doc_id&quot;</span><span class="p">]</span>
+        
+        <span class="n">retrieved</span> <span class="o">=</span> <span class="n">retrieve</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+        
+        <span class="c1"># 检查期望的 doc_id 是否出现在结果中</span>
+        <span class="n">retrieved_doc_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;doc_id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">retrieved</span><span class="p">]</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="n">expected_doc_id</span> <span class="ow">in</span> <span class="n">retrieved_doc_ids</span>
+        
+        <span class="k">if</span> <span class="n">hit</span><span class="p">:</span>
+            <span class="n">hit_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">hit_rank</span> <span class="o">=</span> <span class="n">retrieved_doc_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">expected_doc_id</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hit_rank</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="n">details</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">,</span>
+            <span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="n">expected_doc_id</span><span class="p">,</span>
+            <span class="s2">&quot;retrieved_ids&quot;</span><span class="p">:</span> <span class="n">retrieved_doc_ids</span><span class="p">,</span>
+            <span class="s2">&quot;hit&quot;</span><span class="p">:</span> <span class="n">hit</span><span class="p">,</span>
+            <span class="s2">&quot;hit_rank&quot;</span><span class="p">:</span> <span class="n">hit_rank</span><span class="p">,</span>
+            <span class="s2">&quot;top_distance&quot;</span><span class="p">:</span> <span class="n">retrieved</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">retrieved</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">})</span>
+    
+    <span class="n">recall_at_k</span> <span class="o">=</span> <span class="n">hit_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_cases</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;recall_at_k&quot;</span><span class="p">:</span> <span class="n">recall_at_k</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="n">top_k</span><span class="p">,</span> <span class="s2">&quot;details&quot;</span><span class="p">:</span> <span class="n">details</span><span class="p">}</span>
+
+
+<span class="c1"># 5 个测试用例</span>
+<span class="n">eval_cases</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;大语言模型是如何训练的？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;expected_doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_001&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;RAG 的离线和在线阶段分别做什么？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;expected_doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_002&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;自注意力机制如何捕获长距离依赖？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;expected_doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_003&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;余弦相似度和欧氏距离的区别&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;expected_doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_004&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;思维链提示词是什么技术？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;expected_doc_id&quot;</span><span class="p">:</span> <span class="s2">&quot;doc_005&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">eval_result</span> <span class="o">=</span> <span class="n">evaluate_retrieval</span><span class="p">(</span><span class="n">eval_cases</span><span class="p">,</span> <span class="n">kb_collection</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recall@</span><span class="si">{</span><span class="n">eval_result</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">eval_result</span><span class="p">[</span><span class="s1">&#39;recall_at_k&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;#&#39;</span><span class="si">:</span><span class="s2">&lt;3</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;命中&#39;</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;排名&#39;</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;最小距离&#39;</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;问题&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eval_result</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">hit_str</span> <span class="o">=</span> <span class="s2">&quot;✓&quot;</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hit&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;✗&quot;</span>
+    <span class="n">rank_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;hit_rank&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hit_rank&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+    <span class="n">dist_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;top_distance&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;top_distance&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&lt;3</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hit_str</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rank_str</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">dist_str</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">][:</span><span class="mi">30</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hit&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    期望: </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;expected&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">，实际检索到: </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;retrieved_ids&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Recall@3 = 100.00%
+
+#   命中    排名    最小距离       问题
+-----------------------------------------------------------------
+1   ✓     1     0.2957     大语言模型是如何训练的？
+2   ✓     1     0.4810     RAG 的离线和在线阶段分别做什么？
+3   ✓     1     0.5923     自注意力机制如何捕获长距离依赖？
+4   ✓     1     0.4899     余弦相似度和欧氏距离的区别
+5   ✓     1     0.5055     思维链提示词是什么技术？
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="rag-vs-llm">
+<h2>第六节：RAG vs 直接问 LLM<a class="headerlink" href="#rag-vs-llm" title="Link to this heading">#</a></h2>
+<p>RAG 最重要的价值是<strong>事实基础</strong>：模型的回答有据可查，而非凭空生成。</p>
+<p>本节对同一个问题进行两种方式的回答对比：</p>
+<ul class="simple">
+<li><p><strong>直接问 LLM</strong>：模型只能依赖训练数据，可能给出泛化或错误的答案</p></li>
+<li><p><strong>RAG 回答</strong>：模型基于知识库中的具体内容，回答更精准、可追溯</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">direct_llm_answer</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;直接调用 LLM，不提供任何上下文。&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">}],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+
+<span class="c1"># 选取一个在知识库中有具体信息的问题</span>
+<span class="n">comparison_question</span> <span class="o">=</span> <span class="s2">&quot;RAG 技术解决了大语言模型的哪三个具体痛点？请逐一说明。&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;对比问题: </span><span class="si">{</span><span class="n">comparison_question</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">【方式一：直接问 LLM（无上下文）】&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+<span class="n">direct_answer</span> <span class="o">=</span> <span class="n">direct_llm_answer</span><span class="p">(</span><span class="n">comparison_question</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">direct_answer</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">【方式二：RAG 回答（有知识库支撑）】&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+<span class="n">rag_ans</span> <span class="o">=</span> <span class="n">rag_answer</span><span class="p">(</span><span class="n">comparison_question</span><span class="p">,</span> <span class="n">kb_collection</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rag_ans</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;分析：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  直接 LLM：回答来自训练数据，内容可能正确，但无法追溯来源&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  RAG 回答：内容源自 &#39;RAG技术报告&#39;，可追溯、可验证&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  RAG 的优势在事实密集型、专业领域、需要时效性信息时最为突出&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>对比问题: RAG 技术解决了大语言模型的哪三个具体痛点？请逐一说明。
+=================================================================
+
+【方式一：直接问 LLM（无上下文）】
+----------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>简短回答：RAG（Retrieval‑Augmented Generation）主要解决三类痛点——知识覆盖与时效性、生成内容的可验证性/幻觉（hallucination）、以及模型上下文/规模与成本限制。下面逐一说明每个痛点、RAG 如何缓解、并给出要点与注意事项。
+
+1) 知识覆盖不足与时效性（knowledge cutoff / domain gaps）
+- 痛点：纯靠预训练参数的 LLM 知识固定于训练时，无法及时包含最新信息或特定领域的细节（法律条文、公司内部文档、专利数据等）。
+- RAG 解决方式：在生成前检索外部文档库（网页、数据库、内部知识库、向量索引等），把相关片段拼接进 prompt，模型基于这些检索到的上下文生成答案，从而“动态”利用最新或领域特定信息。
+- 举例：需要回答“某公司最新季度财报要点”时，先检索最新财报段落，再基于这些段落生成摘要，避免依赖旧知识。
+- 注意/最佳实践：检索库需要及时更新；检索质量直接决定最终答案的正确性；要设计好检索策略（布尔、向量、混合）与 chunking 大小。
+
+2) 生成幻觉与可验证性不足（hallucination / traceability）
+- 痛点：LLM 有时会编造事实或给出无法追溯的断言，尤其在细节或引用场景中不可接受。
+- RAG 解决方式：模型在生成过程中直接引用检索到的文档片段（并可返回来源链接/段落 ID），为答案提供证据链，使输出更可验证、可审计，并降低无中生有的概率。
+- 举例：法律咨询或学术问答中，RAG 可以在回答后附上检索到的法规条文或论文段落与页码，便于用户核验。
+- 注意/最佳实践：模型仍可能“曲解”或错误引用检索文本，需要后处理（事实检验、置信度阈值、使用 reranker 或 extractive verification）并在界面上明确标注来源与可信度。
+
+3) 上下文窗口/规模与成本限制（长文档、个性化与参数规模问题）
+- 痛点：大规模知识库无法全部放入模型上下文窗口，训练或微调包含全部信息代价高昂且不可扩展；对个性化/多用户知识存储需求也难以直接用模型参数解决。
+- RAG 解决方式：把知识库存放在外部索引（向量数据库/搜索引擎），按需检索相关片段拼入有限上下文，避免把大量信息写进模型参数或上下文，从而实现对海量文档的可扩展访问并降低推理成本。也便于为不同用户注入个性化上下文。
+- 举例：要在客服场景中支持数百万条知识库条目，RAG 仅检索与当前对话相关的几条，既保持响应速度又支持大规模知识。
+- 注意/最佳实践：需要设计高效的索引、缓存与检索策略以降低延迟；检索与生成分开会带来工程复杂度（同步、版本控制、权限管理）；可结合轻量微调或提示工程提升生成对检索上下文的利用率。
+
+补充几点限制与实务建议
+- RAG 的效果高度依赖检索质量（检索错误会直接导致错误输出）。使用向量检索 + 精排（reranker）常能显著提高准确率。
+- 仍有“模型忽视上下文”或“拼贴式引用导致语义错配”的问题，需要在 prompt 中明确指令（只基于检索文本回答／标注不确定项）。
+- 考虑合规与隐私：外部检索库与日志需做好权限与审计。
+- 常见改进：混合检索（sparse + dense）、文档分块优化、检索-生成迭代（retrieve → generate → verify → re-retrieve）以及返回证据与置信度分数。
+
+如果需要，我可以基于你关注的具体场景（客服、法律、医学、企业内网等）给出更具体的 RAG 架构建议与检索/提示范例。
+
+【方式二：RAG 回答（有知识库支撑）】
+----------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RAG 技术解决了三大痛点（来源：RAG 技术报告）：
+
+1. 知识截止日期（训练数据有时效性）  
+   说明：训练得到的 LLM 可能只包含到某一时间点的知识，无法获得最新信息。RAG 在回答时先从外部知识库检索相关内容并提供给模型，利用检索到的最新文档作为上下文来弥补训练数据的时效性（见文档3）。
+
+2. 幻觉问题（模型可能编造事实）  
+   说明：纯生成式模型可能会“编造”事实。RAG 将检索到的真实文档片段拼接进提示词，令模型基于检索到的证据生成回答，从而降低幻觉发生的概率（见文档3、文档2 关于在线阶段检索并拼接文档的描述）。
+
+3. 领域知识不足（通用模型缺乏专业知识）  
+   说明：通用 LLM 在专业领域可能知识不足。RAG 通过从领域相关的知识库检索并提供专门文档作为上下文，使模型能利用外部领域资料生成更具专业性的回答（见文档3）。
+
+=================================================================
+分析：
+  直接 LLM：回答来自训练数据，内容可能正确，但无法追溯来源
+  RAG 回答：内容源自 &#39;RAG技术报告&#39;，可追溯、可验证
+  RAG 的优势在事实密集型、专业领域、需要时效性信息时最为突出
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h2>总结<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<section id="id8">
+<h3>完整 RAG 流水线图<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────┐
+│                    离线索引阶段（一次性）                      │
+│                                                             │
+│  原始文档                                                    │
+│     │                                                       │
+│     ▼  chunk_text(size=300, overlap=50)                     │
+│  文本块 [chunk_0, chunk_1, ..., chunk_N]                    │
+│     │                                                       │
+│     ▼  get_embeddings(chunks)  [批量调用 Embedding API]      │
+│  向量  [emb_0, emb_1, ..., emb_N]                          │
+│     │                                                       │
+│     ▼  collection.add(ids, embeddings, documents, metadata)  │
+│  ChromaDB 向量库（持久化存储）                               │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          │  每次查询时
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    在线推理阶段（每次查询）                    │
+│                                                             │
+│  用户问题: &quot;RAG 是什么？&quot;                                    │
+│     │                                                       │
+│     ▼  get_embedding(question)                              │
+│  问题向量                                                   │
+│     │                                                       │
+│     ▼  collection.query(top_k=3) + 可选 where 过滤          │
+│  相关文档块 [chunk_a, chunk_b, chunk_c]  +  距离分数         │
+│     │                                                       │
+│     ▼  构建提示词                                           │
+│  System: 只根据上下文回答...                                │
+│  User:   上下文: [chunk_a]\n[chunk_b]\n[chunk_c]           │
+│          问题: RAG 是什么？                                  │
+│     │                                                       │
+│     ▼  litellm.completion(model, messages)                  │
+│  最终回答（有事实依据，可追溯来源）                           │
+└─────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="id9">
+<h3>本章核心代码结构<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>函数</p></th>
+<th class="head"><p>作用</p></th>
+<th class="head"><p>关键参数</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">chunk_text(text,</span> <span class="pre">size,</span> <span class="pre">overlap)</span></code></p></td>
+<td><p>文档切块</p></td>
+<td><p>size=300, overlap=50</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_embeddings(texts)</span></code></p></td>
+<td><p>批量向量化</p></td>
+<td><p>EMBED_MODEL</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">retrieve(query,</span> <span class="pre">collection,</span> <span class="pre">top_k)</span></code></p></td>
+<td><p>语义检索</p></td>
+<td><p>top_k=3, where 过滤</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rag_answer(question,</span> <span class="pre">collection)</span></code></p></td>
+<td><p>完整 RAG 问答</p></td>
+<td><p>MODEL, SYSTEM_PROMPT</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evaluate_retrieval(cases,</span> <span class="pre">collection,</span> <span class="pre">k)</span></code></p></td>
+<td><p>检索质量评估</p></td>
+<td><p>Recall&#64;K</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id10">
+<h3>下一步优化方向<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Reranker</strong>：在 Top-K 检索后，用交叉编码器重新排序，提升精度</p></li>
+<li><p><strong>混合检索</strong>：结合 BM25（关键词）和向量检索，优势互补</p></li>
+<li><p><strong>查询扩展</strong>：用 LLM 生成多个查询变体，提高召回率</p></li>
+<li><p><strong>多轮对话 RAG</strong>：结合对话历史，支持追问和上下文关联</p></li>
+<li><p><strong>流式输出</strong>：使用 <code class="docutils literal notranslate"><span class="pre">litellm.completion(stream=True)</span></code> 实现打字机效果</p></li>
+<li><p><strong>引用追踪</strong>：在回答中标注具体来自哪篇文档的哪一段</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/04_rag"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03_vector_db.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">向量数据库：ChromaDB 实战</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../05_agents/01_react.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ReAct 模式：推理 + 行动</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">核心辅助函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">第一节：构建知识库</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">第二节：RAG 检索函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">第三节：RAG 生成函数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">第四节：完整问答演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">第五节：评估检索质量</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rag-vs-llm">第六节：RAG vs 直接问 LLM</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">总结</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">完整 RAG 流水线图</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">本章核心代码结构</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">下一步优化方向</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

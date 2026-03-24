@@ -1,0 +1,1112 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>03 · Context Window &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/01_foundations/03_context_window';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="04 · Sampling Parameters" href="04_sampling_params.html" />
+    <link rel="prev" title="02 · Embeddings" href="02_embeddings.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/01_foundations/03_context_window.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/01_foundations/03_context_window.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>03 · Context Window</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1. Context Window 是什么</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2. 各模型的窗口大小</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 超出窗口时会发生什么？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 长文本处理的三种策略</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5. 实用工具：发送前检查</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">小结</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="context-window">
+<h1>03 · Context Window<a class="headerlink" href="#context-window" title="Link to this heading">#</a></h1>
+<p>每次调用 LLM，你能放进去的内容是有上限的——这个上限就是 <strong>Context Window（上下文窗口）</strong>。</p>
+<p>理解它对实际开发至关重要：</p>
+<ul class="simple">
+<li><p>为什么模型会「忘记」对话开头说的内容？</p></li>
+<li><p>为什么处理长文档需要特殊策略？</p></li>
+<li><p>为什么更大的窗口意味着更高的成本？</p></li>
+</ul>
+<p>本章从原理讲起，然后动手实验，最后给出实用的长文本处理方案。</p>
+<section id="id1">
+<h2>1. Context Window 是什么<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>Transformer 模型在生成每个 token 时，会对<strong>所有已有 token</strong> 做 Attention 运算：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Attention 计算量 ∝ n²  （n = token 数量）
+</pre></div>
+</div>
+<p>这意味着：</p>
+<ul class="simple">
+<li><p>窗口翻倍 → 计算量翻 4 倍、显存翻 4 倍</p></li>
+<li><p>存在物理上限，超出则无法计算</p></li>
+</ul>
+<p><strong>Context Window 包含什么：</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────┐
+│  System Prompt                          │
+│  ─────────────────────────────────────  │
+│  对话历史 (User + Assistant turns)       │
+│  ─────────────────────────────────────  │
+│  当前 User 输入                          │
+│  ─────────────────────────────────────  │
+│  [待生成的 Assistant 输出]               │
+└─────────────────────────────────────────┘
+         全部加起来不能超过窗口上限
+</pre></div>
+</div>
+<p><strong>Input tokens + Output tokens ≤ Context Window</strong></p>
+</section>
+<section id="id2">
+<h2>2. 各模型的窗口大小<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 主流模型的 context window（2025 年数据，请以官网为准）</span>
+<span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># (模型名,               上下文窗口,  最大输出,   发布时间)</span>
+    <span class="p">(</span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">,</span>        <span class="mi">4_096</span><span class="p">,</span>       <span class="mi">4_096</span><span class="p">,</span>      <span class="s2">&quot;2022&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>                <span class="mi">8_192</span><span class="p">,</span>       <span class="mi">4_096</span><span class="p">,</span>      <span class="s2">&quot;2023&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>             <span class="mi">128_000</span><span class="p">,</span>      <span class="mi">16_384</span><span class="p">,</span>      <span class="s2">&quot;2024&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>        <span class="mi">128_000</span><span class="p">,</span>      <span class="mi">16_384</span><span class="p">,</span>      <span class="s2">&quot;2024&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;claude-3-haiku&quot;</span><span class="p">,</span>     <span class="mi">200_000</span><span class="p">,</span>       <span class="mi">4_096</span><span class="p">,</span>      <span class="s2">&quot;2024&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;claude-sonnet-4-6&quot;</span><span class="p">,</span>  <span class="mi">200_000</span><span class="p">,</span>      <span class="mi">64_000</span><span class="p">,</span>      <span class="s2">&quot;2025&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;gemini-1.5-pro&quot;</span><span class="p">,</span>   <span class="mi">1_000_000</span><span class="p">,</span>       <span class="mi">8_192</span><span class="p">,</span>      <span class="s2">&quot;2024&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;gemini-2.0-flash&quot;</span><span class="p">,</span> <span class="mi">1_000_000</span><span class="p">,</span>       <span class="mi">8_192</span><span class="p">,</span>      <span class="s2">&quot;2025&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># 换算成「能装多少内容」</span>
+<span class="n">CHARS_PER_TOKEN_EN</span> <span class="o">=</span> <span class="mi">4</span>   <span class="c1"># 英文</span>
+<span class="n">CHARS_PER_TOKEN_ZH</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c1"># 中文</span>
+<span class="n">WORDS_PER_PAGE</span> <span class="o">=</span> <span class="mi">500</span>     <span class="c1"># 英文，每页约 500 词</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;模型&#39;</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;窗口(K)&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;最大输出(K)&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;约等于(英文页数)&#39;</span><span class="si">:</span><span class="s2">&gt;16</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+    <span class="n">pages</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctx</span> <span class="o">*</span> <span class="n">CHARS_PER_TOKEN_EN</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">WORDS_PER_PAGE</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># ~5 chars/word</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ctx</span><span class="o">//</span><span class="mi">1000</span><span class="si">:</span><span class="s2">&gt;7</span><span class="si">}</span><span class="s2">K </span><span class="si">{</span><span class="n">out</span><span class="o">//</span><span class="mi">1000</span><span class="si">:</span><span class="s2">&gt;11</span><span class="si">}</span><span class="s2">K </span><span class="si">{</span><span class="n">pages</span><span class="si">:</span><span class="s2">&gt;14.0f</span><span class="si">}</span><span class="s2"> 页&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型                        窗口(K)      最大输出(K)        约等于(英文页数)
+-----------------------------------------------------------------
+gpt-3.5-turbo                4K           4K              7 页
+gpt-4                        8K           4K             13 页
+gpt-4o                     128K          16K            205 页
+gpt-4o-mini                128K          16K            205 页
+claude-3-haiku             200K           4K            320 页
+claude-sonnet-4-6          200K          64K            320 页
+gemini-1.5-pro            1000K           8K           1600 页
+gemini-2.0-flash          1000K           8K           1600 页
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tiktoken</span>
+
+<span class="n">enc</span> <span class="o">=</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">get_encoding</span><span class="p">(</span><span class="s2">&quot;cl100k_base&quot;</span><span class="p">)</span>
+
+<span class="c1"># 实际可用的 input token = 窗口上限 - 预留给输出的 token</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">available_input_tokens</span><span class="p">(</span>
+    <span class="n">context_limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">reserved_for_output</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">system_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">system_prompt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">context_limit</span> <span class="o">-</span> <span class="n">reserved_for_output</span> <span class="o">-</span> <span class="n">system_tokens</span>
+
+<span class="n">system</span> <span class="o">=</span> <span class="s2">&quot;You are a helpful assistant that answers questions concisely.&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;实际可用 Input Token（扣除 system prompt + 预留 1K 输出）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;模型&#39;</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;窗口&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;可用 Input&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">48</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+    <span class="n">avail</span> <span class="o">=</span> <span class="n">available_input_tokens</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">reserved_for_output</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">system_prompt</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ctx</span><span class="si">:</span><span class="s2">&gt;10,</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">avail</span><span class="si">:</span><span class="s2">&gt;12,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>实际可用 Input Token（扣除 system prompt + 预留 1K 输出）：
+模型                             窗口     可用 Input
+------------------------------------------------
+gpt-3.5-turbo               4,096        3,084
+gpt-4                       8,192        7,180
+gpt-4o                    128,000      126,988
+gpt-4o-mini               128,000      126,988
+claude-3-haiku            200,000      198,988
+claude-sonnet-4-6         200,000      198,988
+gemini-1.5-pro          1,000,000      998,988
+gemini-2.0-flash        1,000,000      998,988
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2>3. 超出窗口时会发生什么？<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>超出限制时，API 会直接报错（不会静默截断）。
+我们来构造一个接近边界的场景，用真实 API 感受一下。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># 当前配置的模型</span>
+<span class="n">current_model</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;未设置&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;当前模型: </span><span class="si">{</span><span class="n">current_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 模拟一个很长的对话历史</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_long_text</span><span class="p">(</span><span class="n">target_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;生成大约 target_tokens 个 token 的文本。&quot;&quot;&quot;</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;The quick brown fox jumps over the lazy dog. &quot;</span>  <span class="c1"># ~10 tokens</span>
+    <span class="n">unit_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">unit</span><span class="p">))</span>
+    <span class="n">repeats</span> <span class="o">=</span> <span class="n">target_tokens</span> <span class="o">//</span> <span class="n">unit_tokens</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">unit</span> <span class="o">*</span> <span class="n">repeats</span>
+    <span class="n">actual</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">,</span> <span class="n">actual</span>
+
+<span class="c1"># 生成不同长度的文本</span>
+<span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1_000</span><span class="p">,</span> <span class="mi">10_000</span><span class="p">,</span> <span class="mi">50_000</span><span class="p">]:</span>
+    <span class="n">text</span><span class="p">,</span> <span class="n">actual</span> <span class="o">=</span> <span class="n">make_long_text</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;目标 </span><span class="si">{</span><span class="n">target</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2"> tokens → 实际 </span><span class="si">{</span><span class="n">actual</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2"> tokens  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> 字符)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>当前模型: openai/gpt-5-mini
+目标    100 tokens → 实际     91 tokens  (405 字符)
+目标   1000 tokens → 实际    901 tokens  (4,050 字符)
+目标  10000 tokens → 实际   9091 tokens  (40,905 字符)
+目标  50000 tokens → 实际  45451 tokens  (204,525 字符)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">utils.llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span>
+
+<span class="c1"># 发送一个正常大小的请求，观察 token 使用情况</span>
+<span class="n">long_text</span><span class="p">,</span> <span class="n">token_count</span> <span class="o">=</span> <span class="n">make_long_text</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">long_text</span><span class="si">}</span>
+
+<span class="s2">请用一句话总结上面这段文字的主要内容。&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt token 数: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">))</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Prompt token 数: 469
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Response: 这段文字多次重复了英文示例句 “The quick brown fox jumps over the lazy dog。”
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 验证「遗忘效应」：把关键信息放在很长文本的开头，看模型还记不记得</span>
+<span class="n">secret</span> <span class="o">=</span> <span class="s2">&quot;SECRET_CODE_42XZ&quot;</span>
+<span class="n">filler</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_long_text</span><span class="p">(</span><span class="mi">3000</span><span class="p">)</span>  <span class="c1"># 3K tokens 的填充内容</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;记住这个暗号：</span><span class="si">{</span><span class="n">secret</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">filler</span><span class="si">}</span>
+
+<span class="s2">请告诉我之前给你的暗号是什么？&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt token 数: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">))</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">模型回答: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">暗号是否在回答中: </span><span class="si">{</span><span class="n">secret</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Prompt token 数: 2,755
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型回答: 暗号是：SECRET_CODE_42XZ
+
+暗号是否在回答中: True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>4. 长文本处理的三种策略<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>当文本超出窗口，有三种基本策略：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>策略</p></th>
+<th class="head"><p>适用场景</p></th>
+<th class="head"><p>缺点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>截断</strong></p></td>
+<td><p>只关心开头或结尾</p></td>
+<td><p>丢失信息</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>滑动窗口</strong></p></td>
+<td><p>需要连续处理整个文本</p></td>
+<td><p>边界处信息割裂</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>分块摘要</strong></p></td>
+<td><p>需要理解全文</p></td>
+<td><p>多次 API 调用，摘要有损</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── 策略 1：截断 ──────────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">truncate</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">from_end</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    截断文本到 max_tokens。</span>
+<span class="sd">    from_end=True 保留末尾（适合对话历史：保留最近的内容）。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_tokens</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">text</span>
+    <span class="k">if</span> <span class="n">from_end</span><span class="p">:</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="o">-</span><span class="n">max_tokens</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[:</span><span class="n">max_tokens</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">enc</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+<span class="n">sample</span> <span class="o">=</span> <span class="s2">&quot;这是一段很长的文本。&quot;</span> <span class="o">*</span> <span class="mi">200</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;原始: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sample</span><span class="p">))</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+
+<span class="n">t1</span> <span class="o">=</span> <span class="n">truncate</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_end</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;保留开头 100 tokens: &#39;</span><span class="si">{</span><span class="n">t1</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&#39;&quot;</span><span class="p">)</span>
+
+<span class="n">t2</span> <span class="o">=</span> <span class="n">truncate</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_end</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;保留末尾 100 tokens: &#39;...</span><span class="si">{</span><span class="n">t2</span><span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">:]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>原始: 2200 tokens
+保留开头 100 tokens: &#39;这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。...&#39;
+保留末尾 100 tokens: &#39;...这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。这是一段很长的文本。&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── 策略 2：滑动窗口分块 ──────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sliding_window_chunks</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">overlap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    把文本切成有重叠的块，避免边界信息丢失。</span>
+<span class="sd">    overlap: 相邻块之间共享的 token 数。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="n">start</span> <span class="o">+=</span> <span class="n">chunk_size</span> <span class="o">-</span> <span class="n">overlap</span>
+    <span class="k">return</span> <span class="n">chunks</span>
+
+<span class="n">long_doc</span> <span class="o">=</span> <span class="s2">&quot;人工智能的发展历史悠久。&quot;</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="n">sliding_window_chunks</span><span class="p">(</span><span class="n">long_doc</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;原始文本: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">long_doc</span><span class="p">))</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;分块结果: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="si">}</span><span class="s2"> 块&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Chunk </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">c</span><span class="p">))</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>原始文本: 1700 tokens
+分块结果: 21 块
+  Chunk 1: 100 tokens
+  Chunk 2: 99 tokens
+  Chunk 3: 100 tokens
+  Chunk 4: 100 tokens
+  Chunk 5: 100 tokens
+  Chunk 6: 100 tokens
+  Chunk 7: 100 tokens
+  Chunk 8: 100 tokens
+  Chunk 9: 100 tokens
+  Chunk 10: 100 tokens
+  Chunk 11: 100 tokens
+  Chunk 12: 100 tokens
+  Chunk 13: 100 tokens
+  Chunk 14: 100 tokens
+  Chunk 15: 99 tokens
+  Chunk 16: 100 tokens
+  Chunk 17: 100 tokens
+  Chunk 18: 100 tokens
+  Chunk 19: 99 tokens
+  Chunk 20: 100 tokens
+  Chunk 21: 100 tokens
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── 策略 3：分块摘要（Map-Reduce 模式）─────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">map_reduce_summarize</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+    <span class="n">overlap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Map:    每个 chunk 单独摘要</span>
+<span class="sd">    Reduce: 把所有摘要合并，再做一次最终摘要</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">sliding_window_chunks</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="n">overlap</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;文档分成 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="si">}</span><span class="s2"> 块，开始 Map 阶段...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Map：每块单独摘要</span>
+    <span class="n">summaries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;请用 2-3 句话概括以下内容的要点：</span><span class="se">\n\n</span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">summaries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Chunk </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="si">}</span><span class="s2"> 摘要完成&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Reduce：合并所有摘要，生成最终摘要</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reduce 阶段...&quot;</span><span class="p">)</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[部分 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">summaries</span><span class="p">))</span>
+    <span class="n">final</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;以下是一篇文档各部分的摘要，请整合成一个连贯的总体摘要（200字以内）：</span><span class="se">\n\n</span><span class="si">{</span><span class="n">combined</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">final</span>
+
+
+<span class="c1"># 用一篇「假长文档」测试（实际场景替换成真实内容）</span>
+<span class="n">fake_long_doc</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">人工智能（AI）的发展可以追溯到 20 世纪 50 年代。1956 年，达特茅斯会议标志着 AI 作为一个学科正式诞生。</span>
+<span class="s2">早期 AI 研究主要集中在符号推理和专家系统。这一阶段的代表成果包括 LISP 语言和第一批专家系统。</span>
+<span class="s2">然而，受限于计算能力和数据量，AI 在 80 年代末进入了第一次「寒冬」。</span>
+
+<span class="s2">进入 90 年代，机器学习的兴起带来了新的希望。统计方法取代了符号推理，SVM、随机森林等算法相继出现。</span>
+<span class="s2">1997 年，IBM 的深蓝击败国际象棋世界冠军卡斯帕罗夫，成为 AI 史上的里程碑事件。</span>
+
+<span class="s2">2012 年，深度学习迎来爆发。AlexNet 在 ImageNet 竞赛中的惊人表现，宣告了深度学习时代的到来。</span>
+<span class="s2">此后，卷积神经网络（CNN）在图像识别领域全面超越人类水平。</span>
+
+<span class="s2">2017 年，Google 发表了划时代的论文《Attention is All You Need》，提出了 Transformer 架构。</span>
+<span class="s2">这一架构彻底改变了自然语言处理（NLP）领域，为后来的大型语言模型奠定了基础。</span>
+
+<span class="s2">2022 年，ChatGPT 的发布让 AI 真正走入大众视野。其流畅的对话能力和广泛的知识令全球用户震惊。</span>
+<span class="s2">随后，各大科技公司纷纷推出自己的大语言模型：Google 的 Gemini、Anthropic 的 Claude、Meta 的 LLaMA 等。</span>
+
+<span class="s2">如今，AI 已经渗透到医疗、教育、金融、创作等各个领域。</span>
+<span class="s2">如何确保 AI 的安全性、可解释性和公平性，成为当下最重要的研究课题。</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># 重复 3 次模拟更长的文档</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;文档长度: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">fake_long_doc</span><span class="p">))</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">final_summary</span> <span class="o">=</span> <span class="n">map_reduce_summarize</span><span class="p">(</span><span class="n">fake_long_doc</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最终摘要：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">final_summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>文档长度: 1774 tokens
+==================================================
+文档分成 7 块，开始 Map 阶段...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 1/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 2/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 3/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 4/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 5/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 6/7 摘要完成
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Chunk 7/7 摘要完成
+
+Reduce 阶段...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最终摘要：
+本文梳理人工智能发展里程碑：从符号推理向统计方法转变，涌现SVM、随机森林等算法；1997年深蓝胜卡斯帕罗夫，2012年AlexNet及CNN在图像识别上实现超越人类；2017年Transformer奠定现代NLP与大型语言模型基础，2022年ChatGPT使AI走入大众并催生Gemini、Claude、LLaMA等竞品。如今AI已渗透医疗、教育、金融与创作领域，研究重心转向安全性、可解释性与公平性。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>5. 实用工具：发送前检查<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>在真实项目中，每次调用 API 前都应该检查 token 用量，避免超限报错。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONTEXT_LIMITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;openai/gpt-4o&quot;</span><span class="p">:</span>               <span class="mi">128_000</span><span class="p">,</span>
+    <span class="s2">&quot;openai/gpt-4o-mini&quot;</span><span class="p">:</span>          <span class="mi">128_000</span><span class="p">,</span>
+    <span class="s2">&quot;anthropic/claude-sonnet-4-6&quot;</span><span class="p">:</span> <span class="mi">200_000</span><span class="p">,</span>
+    <span class="s2">&quot;anthropic/claude-haiku-4-5&quot;</span><span class="p">:</span>  <span class="mi">200_000</span><span class="p">,</span>
+    <span class="s2">&quot;gemini/gemini-2.0-flash&quot;</span><span class="p">:</span>   <span class="mi">1_000_000</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">token_budget</span><span class="p">(</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">reserved_output</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    计算当前 messages 的 token 用量和剩余预算。</span>
+
+<span class="sd">    messages 格式：[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;...&quot;}, ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;openai/gpt-4o&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 统计所有 message 的 token</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">)</span>
+    <span class="c1"># 每条消息有约 4 token 的格式开销</span>
+    <span class="n">total</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span>
+
+    <span class="n">limit</span> <span class="o">=</span> <span class="n">CONTEXT_LIMITS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="mi">128_000</span><span class="p">)</span>
+    <span class="n">remaining</span> <span class="o">=</span> <span class="n">limit</span> <span class="o">-</span> <span class="n">total</span> <span class="o">-</span> <span class="n">reserved_output</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+        <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="s2">&quot;reserved_output&quot;</span><span class="p">:</span> <span class="n">reserved_output</span><span class="p">,</span>
+        <span class="s2">&quot;remaining&quot;</span><span class="p">:</span> <span class="n">remaining</span><span class="p">,</span>
+        <span class="s2">&quot;usage_pct&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="n">limit</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="n">remaining</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="c1"># 示例：模拟一个多轮对话</span>
+<span class="n">conversation</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>      <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;什么是机器学习？&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;机器学习是人工智能的一个分支...&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>      <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;能详细解释一下监督学习吗？&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">budget</span> <span class="o">=</span> <span class="n">token_budget</span><span class="p">(</span><span class="n">conversation</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;已用: </span><span class="si">{</span><span class="n">budget</span><span class="p">[</span><span class="s1">&#39;used&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;上限: </span><span class="si">{</span><span class="n">budget</span><span class="p">[</span><span class="s1">&#39;limit&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;剩余: </span><span class="si">{</span><span class="n">budget</span><span class="p">[</span><span class="s1">&#39;remaining&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;用量: </span><span class="si">{</span><span class="n">budget</span><span class="p">[</span><span class="s1">&#39;usage_pct&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;安全: </span><span class="si">{</span><span class="n">budget</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>已用: 65 tokens
+上限: 128,000 tokens
+剩余: 126,935 tokens
+用量: 0.1%
+安全: True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2>小结<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>概念</p></th>
+<th class="head"><p>要点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Context Window</p></td>
+<td><p>Attention 的 O(n²) 代价决定了物理上限</p></td>
+</tr>
+<tr class="row-odd"><td><p>超出限制</p></td>
+<td><p>API 直接报错，不会静默截断</p></td>
+</tr>
+<tr class="row-even"><td><p>遗忘效应</p></td>
+<td><p>长文本中「中间」的内容容易被忽略（Lost in the Middle）</p></td>
+</tr>
+<tr class="row-odd"><td><p>截断</p></td>
+<td><p>最简单，适合只关心首尾的场景</p></td>
+</tr>
+<tr class="row-even"><td><p>滑动窗口</p></td>
+<td><p>适合需要连续处理的场景，overlap 避免边界割裂</p></td>
+</tr>
+<tr class="row-odd"><td><p>分块摘要</p></td>
+<td><p>Map-Reduce 模式，适合需要理解全文的场景</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>下一章 →</strong> <a class="reference internal" href="04_sampling_params.html"><span class="std std-doc">Sampling Parameters</span></a>：temperature、top-p、top-k 如何控制模型的「创造力」</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/01_foundations"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02_embeddings.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">02 · Embeddings</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="04_sampling_params.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">04 · Sampling Parameters</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">1. Context Window 是什么</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2. 各模型的窗口大小</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 超出窗口时会发生什么？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4. 长文本处理的三种策略</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5. 实用工具：发送前检查</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">小结</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

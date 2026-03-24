@@ -1,0 +1,925 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>01 · Streaming &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/03_api/01_streaming';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="02 · Function Calling" href="02_function_calling.html" />
+    <link rel="prev" title="03 · Structured Output" href="../02_prompting/03_structured_output.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/03_api/01_streaming.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/03_api/01_streaming.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>01 · Streaming</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">1. 基础：非流式 vs 流式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#token">2. 统计 Token 速率</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3. 中途取消</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">4. 收集完整响应</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">5. 流式 + 结构化输出</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">小结</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="streaming">
+<h1>01 · Streaming<a class="headerlink" href="#streaming" title="Link to this heading">#</a></h1>
+<p>默认情况下，<code class="docutils literal notranslate"><span class="pre">chat()</span></code> 要等模型生成完所有内容才返回。
+对于长回答，这可能需要几十秒——用户体验很差。</p>
+<p><strong>Streaming</strong> 让模型边生成边推送 token，实现「打字机」效果，
+首个 token 的延迟从几十秒降到不到 1 秒。</p>
+<p>本章覆盖：基础流式输出、进度统计、中途取消、实用封装。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils.llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">stream_chat</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<section id="vs">
+<h2>1. 基础：非流式 vs 流式<a class="headerlink" href="#vs" title="Link to this heading">#</a></h2>
+<p>感受一下等待时间的差异。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">utils.llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;用200字介绍人工智能的发展历史。&quot;</span>
+
+<span class="c1"># 非流式：等全部生成完才返回</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[非流式] 等待中...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; 完成（</span><span class="si">{</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[非流式] 等待中... 完成（13.5s）
+人工智能始于20世纪50年代，图灵提出机器思考设想，1956年达特茅斯会议奠基。60—70年代以符号主义与专家系统为主，80年代遭遇AI寒冬。90年代统计学习兴起，2000年代大数据与GPU推动深度学 ...
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 流式：token 边生成边显示</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[流式] 实时输出：</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">first_token_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream_chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">first_token_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">first_token_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+<span class="k">if</span> <span class="n">first_token_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">首个 token 延迟: </span><span class="si">{</span><span class="n">first_token_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">首个 token 延迟: N/A (模型未返回流式内容块)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;总耗时: </span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[流式] 实时输出：
+
+人工智能起源于上世纪五十年代，1956年达特茅斯会议奠基。早期以符号主义和专家系统为主，六七十年代与八十年代出现热潮与衰退。九十年代统计学习和机器学习崛起，二十一世纪深度学习特别是2006年后复兴，2012年卷积神经网络在图像识别突破带动大规模应用。如今AI广泛进入工业、医疗、交通等领域，同时围绕数据、算法和伦理展开新一轮挑战与治理。包括隐私、安全、公平和可解释性问题，并要求跨学科合作和制度创新。
+
+首个 token 延迟: 24.77s
+总耗时: 26.5s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="token">
+<h2>2. 统计 Token 速率<a class="headerlink" href="#token" title="Link to this heading">#</a></h2>
+<p>流式输出时实时统计生成速度（tokens/秒）。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tiktoken</span>
+
+<span class="n">enc</span> <span class="o">=</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">get_encoding</span><span class="p">(</span><span class="s2">&quot;cl100k_base&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">stream_with_stats</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;流式输出并统计速率。&quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">t_first</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;输出：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream_chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">t_first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t_first</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">t_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">full_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="n">token_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">full_text</span><span class="p">))</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">t_end</span> <span class="o">-</span> <span class="n">t_first</span> <span class="k">if</span> <span class="n">t_first</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;首 token 延迟&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t_first</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t_start</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span> <span class="k">if</span> <span class="n">t_first</span> <span class="k">else</span> <span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;生成 token 数&quot;</span><span class="p">:</span> <span class="n">token_count</span><span class="p">,</span>
+        <span class="s2">&quot;生成耗时&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;生成速率&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">token_count</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">duration</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> tokens/s&quot;</span> <span class="k">if</span> <span class="n">duration</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">stats</span>
+
+<span class="n">stats</span> <span class="o">=</span> <span class="n">stream_with_stats</span><span class="p">(</span><span class="s2">&quot;列出5种常见的设计模式，每种一句话说明。&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">统计：&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>输出：
+- 单例模式：保证一个类只有一个实例并提供全局访问点。  
+- 工厂方法模式：定义创建对象的接口，让子类决定实例化哪一个类以将创建与使用解耦。  
+- 观察者模式：在对象间建立一对多依赖，当被观察者状态改变时自动通知并更新所有观察者。  
+- 策略模式：将可互换的算法封装为独立策略类，运行时选择不同策略以改变行为。  
+- 装饰器模式：通过组合/包装在不修改原对象的情况下动态为对象添加职责或功能。
+
+统计：
+  首 token 延迟: 5.45s
+  生成 token 数: 201
+  生成耗时: 1.8s
+  生成速率: 112 tokens/s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id1">
+<h2>3. 中途取消<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>流式输出的一个优势：可以在生成过程中中途停止，节省 token 开销。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">stream_until</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stop_keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    流式输出，遇到 stop_keyword 时中止。</span>
+<span class="sd">    适用于：找到关键信息后不需要继续生成。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">collected</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream_chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+        <span class="n">collected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">full</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">collected</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop_keyword</span> <span class="ow">in</span> <span class="n">full</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">[遇到 &#39;</span><span class="si">{</span><span class="n">stop_keyword</span><span class="si">}</span><span class="s2">&#39;，提前停止]&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">collected</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">stream_until</span><span class="p">(</span>
+    <span class="s2">&quot;列举10种编程语言，每种一行，格式：序号. 语言名 - 主要用途&quot;</span><span class="p">,</span>
+    <span class="n">stop_keyword</span><span class="o">=</span><span class="s2">&quot;5.&quot;</span><span class="p">,</span>  <span class="c1"># 看到第5个就停</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1. Python - 通用编程、数据科学、机器学习与Web开发  
+2. Java - 企业级后端与Android应用开发  
+3. JavaScript - 浏览器端交互与前后端（Node.js）全栈开发  
+4. C - 系统编程与嵌入式开发  
+5.
+
+[遇到 &#39;5.&#39;，提前停止]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2>4. 收集完整响应<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>有时需要流式展示，但最后也要拿到完整字符串。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">stream_and_collect</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;流式显示的同时，返回完整响应字符串。&quot;&quot;&quot;</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream_chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>  <span class="c1"># 换行</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+
+<span class="n">full_response</span> <span class="o">=</span> <span class="n">stream_and_collect</span><span class="p">(</span><span class="s2">&quot;用三句话总结深度学习的核心思想。&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">完整响应长度: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">full_response</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>深度学习通过多层神经网络自动从原始数据中学习逐级抽象的特征表示，将复杂任务分解为一系列非线性变换。网络参数通过反向传播结合梯度下降等优化方法在大量数据上端到端训练，使得深模型具备强大的函数逼近和模式识别能力。正是这种表征学习能力推动了视觉、语音和自然语言处理等领域的突破，但也依赖海量数据与计算并面临泛化、可解释性等挑战。
+
+完整响应长度: 161 字符
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2>5. 流式 + 结构化输出<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>流式输出与 JSON 结合：边输出边解析，当 JSON 完整时再处理。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">stream_json</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    流式输出 JSON，完整接收后解析。</span>
+<span class="sd">    显示实时输出让用户感知进度，同时保证结构化数据完整性。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">),</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}],</span>
+        <span class="n">response_format</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;json_object&quot;</span><span class="p">},</span>
+        <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;实时输出：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">if</span> <span class="n">delta</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">))</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">stream_json</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">分析「Python」这门编程语言，输出 JSON，包含：</span>
+<span class="s2">name, created_year, creator, paradigms(列表), use_cases(列表), pros(列表), cons(列表)</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;解析后的结构化数据：&quot;</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>实时输出：
+{
+  &quot;name&quot;: &quot;Python&quot;,
+  &quot;created_year&quot;: 1991,
+  &quot;creator&quot;: &quot;Guido van Rossum&quot;,
+  &quot;paradigms&quot;: [
+    &quot;面向对象&quot;,
+    &quot;命令式/过程式&quot;,
+    &quot;函数式&quot;,
+    &quot;脚本式/解释型&quot;,
+    &quot;反射式&quot;
+  ],
+  &quot;use_cases&quot;: [
+    &quot;Web 开发（后端）&quot;,
+    &quot;数据科学与机器学习&quot;,
+    &quot;科学计算与数值分析&quot;,
+    &quot;自动化脚本与系统运维&quot;,
+    &quot;教育与入门编程&quot;,
+    &quot;快速原型与开发&quot;,
+    &quot;测试与持续集成&quot;,
+    &quot;网络编程与爬虫&quot;,
+    &quot;桌面应用开发&quot;,
+    &quot;嵌入式/物联网（如 Raspberry Pi）&quot;
+  ],
+  &quot;pros&quot;: [
+    &quot;语法简洁、可读性高，易于学习&quot;,
+    &quot;丰富且成熟的标准库与第三方生态（如 NumPy、Pandas、TensorFlow、Django）&quot;,
+    &quot;跨平台，开发与部署门槛低&quot;,
+    &quot;适合快速原型和迭代开发&quot;,
+    &quot;强大的社区支持与大量文档、教程&quot;,
+    &quot;良好的扩展性，可与 C/C++ 等语言集成以提升性能&quot;
+  ],
+  &quot;cons&quot;: [
+    &quot;解释型语言，单线程性能和原始执行速度通常不及编译型语言&quot;,
+    &quot;全局解释器锁（GIL）限制了多线程在 CPU 密集型任务上的并行效率&quot;,
+    &quot;动态类型在大型项目中可能导致运行时错误，需要更多测试和类型检查&quot;,
+    &quot;内存占用相对较高，不适合对资源高度受限的场景&quot;,
+    &quot;移动端原生开发支持较弱，生态不如原生平台成熟&quot;,
+    &quot;包管理与依赖环境在不同项目间可能出现冲突（需要使用虚拟环境）&quot;
+  ]
+}
+
+解析后的结构化数据：
+{
+  &quot;name&quot;: &quot;Python&quot;,
+  &quot;created_year&quot;: 1991,
+  &quot;creator&quot;: &quot;Guido van Rossum&quot;,
+  &quot;paradigms&quot;: [
+    &quot;面向对象&quot;,
+    &quot;命令式/过程式&quot;,
+    &quot;函数式&quot;,
+    &quot;脚本式/解释型&quot;,
+    &quot;反射式&quot;
+  ],
+  &quot;use_cases&quot;: [
+    &quot;Web 开发（后端）&quot;,
+    &quot;数据科学与机器学习&quot;,
+    &quot;科学计算与数值分析&quot;,
+    &quot;自动化脚本与系统运维&quot;,
+    &quot;教育与入门编程&quot;,
+    &quot;快速原型与开发&quot;,
+    &quot;测试与持续集成&quot;,
+    &quot;网络编程与爬虫&quot;,
+    &quot;桌面应用开发&quot;,
+    &quot;嵌入式/物联网（如 Raspberry Pi）&quot;
+  ],
+  &quot;pros&quot;: [
+    &quot;语法简洁、可读性高，易于学习&quot;,
+    &quot;丰富且成熟的标准库与第三方生态（如 NumPy、Pandas、TensorFlow、Django）&quot;,
+    &quot;跨平台，开发与部署门槛低&quot;,
+    &quot;适合快速原型和迭代开发&quot;,
+    &quot;强大的社区支持与大量文档、教程&quot;,
+    &quot;良好的扩展性，可与 C/C++ 等语言集成以提升性能&quot;
+  ],
+  &quot;cons&quot;: [
+    &quot;解释型语言，单线程性能和原始执行速度通常不及编译型语言&quot;,
+    &quot;全局解释器锁（GIL）限制了多线程在 CPU 密集型任务上的并行效率&quot;,
+    &quot;动态类型在大型项目中可能导致运行时错误，需要更多测试和类型检查&quot;,
+    &quot;内存占用相对较高，不适合对资源高度受限的场景&quot;,
+    &quot;移动端原生开发支持较弱，生态不如原生平台成熟&quot;,
+    &quot;包管理与依赖环境在不同项目间可能出现冲突（需要使用虚拟环境）&quot;
+  ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>小结<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>场景</p></th>
+<th class="head"><p>方案</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>用户界面实时显示</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stream_chat()</span></code> 直接打印</p></td>
+</tr>
+<tr class="row-odd"><td><p>需要完整响应字符串</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stream_and_collect()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>找到关键信息后停止</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stream_until()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>流式 + 结构化</p></td>
+<td><p>流式接收 → 完整后解析 JSON</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>核心规律：</strong> 首 token 延迟 &lt; 1s，用户体验远好于等待整个响应。
+在生产应用中，<strong>所有面向用户的 LLM 调用都应该用 Streaming</strong>。</p>
+<p><strong>下一章 →</strong> <a class="reference internal" href="02_function_calling.html"><span class="std std-doc">Function Calling</span></a>：给模型装上「手」，让它调用真实工具</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/03_api"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../02_prompting/03_structured_output.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">03 · Structured Output</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_function_calling.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">02 · Function Calling</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">1. 基础：非流式 vs 流式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#token">2. 统计 Token 速率</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3. 中途取消</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">4. 收集完整响应</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">5. 流式 + 结构化输出</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">小结</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

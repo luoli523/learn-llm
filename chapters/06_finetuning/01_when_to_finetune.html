@@ -1,0 +1,1208 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>第六章：微调 — 01 什么时候需要微调？ &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/06_finetuning/01_when_to_finetune';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="第六章：微调 — 02 LoRA 低秩适配微调" href="02_lora.html" />
+    <link rel="prev" title="多 Agent 系统" href="../05_agents/03_multi_agent.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/06_finetuning/01_when_to_finetune.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/06_finetuning/01_when_to_finetune.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>第六章：微调 — 01 什么时候需要微调？</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1">Section 1：决策树 — 我需要微调吗？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2">Section 2：提示工程先行</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3">Section 3：微调真正适合的场景</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1. 极低延迟（需要小模型）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#token">2. 大量重复任务的 Token 成本优化</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 高度专业领域（私有数据）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api">4. 数据隐私（不能发给 API）</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：成本估算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：数据质量比数量重要</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">总结：微调决策框架</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">核心原则</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">决策检查清单</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="id1">
+<h1>第六章：微调 — 01 什么时候需要微调？<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>微调不是万能药，<strong>90% 的问题可以用提示工程解决</strong>。本章帮你判断什么时候真的需要微调。</p>
+<p>很多工程师一遇到 LLM 表现不理想，第一反应就是想到微调。但微调成本高、周期长、维护难，往往是过度工程化的选择。</p>
+<p><strong>本章目标：</strong></p>
+<ul class="simple">
+<li><p>掌握判断是否需要微调的决策框架</p></li>
+<li><p>学会用提示工程解决常见问题</p></li>
+<li><p>了解微调真正适合的场景</p></li>
+<li><p>估算不同方案的成本</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">drop_params</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;使用模型: </span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># gpt-5/o系列不支持自定义temperature值，统一用安全wrapper</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_c</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">_m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openai/gpt-5&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o1&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o3&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o4&#39;</span><span class="p">)):</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>使用模型: openai/gpt-5-mini
+</pre></div>
+</div>
+</div>
+</div>
+<section id="section-1">
+<h2>Section 1：决策树 — 我需要微调吗？<a class="headerlink" href="#section-1" title="Link to this heading">#</a></h2>
+<p>下面是一个结构化的决策流程，回答每个问题，最终得到一个推荐方案。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>开始
+ │
+ ▼
+知识截止日期问题？
+ │ 是 → 考虑 RAG（检索增强生成），而非微调
+ │ 否
+ ▼
+需要高度一致的输出格式？
+ │ 是 → 先试结构化输出（JSON mode）
+ │ 否
+ ▼
+对延迟极度敏感？（&lt;500ms p99）
+ │ 是 → 考虑微调小模型
+ │ 否
+ ▼
+有高质量标注数据？（&gt;1000 对 QA）
+ │ 否 → 先优化提示词，收集数据
+ │ 是
+ ▼
+成本是否显著高于可接受水平？
+ │ 否 → 继续用 API + 提示工程
+ │ 是 → 微调小模型可能値得
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">finetune_decision_tree</span><span class="p">():</span>
+    <span class="c1"># Interactive decision tree</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  LLM 方案选择决策树&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="n">questions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;knowledge_cutoff&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Q1] 问题是否因为模型不知道你的私有或最新数据？&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="s2">&quot;  例如：公司内部文档、产品手册、最新新闻&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if_yes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;RAG&quot;</span><span class="p">,</span> <span class="s2">&quot;建议使用 RAG。微调无法注入动态知识，而 RAG 可以。&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;consistent_format&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Q2] 是否需要高度一致的输出格式？&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="s2">&quot;  例如：始终输出带特定字段的 JSON&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if_yes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Structured Output&quot;</span><span class="p">,</span> <span class="s2">&quot;先试结构化输出（JSON mode）或 function calling。&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;latency_critical&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Q3] 延迟是否极度敏感？（如需要 p99 &lt; 500ms）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="s2">&quot;  例如：实时语音助手、游戏 NPC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if_yes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Fine-tune Small Model&quot;</span><span class="p">,</span> <span class="s2">&quot;微调小模型自托管，延迟可控。&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;data_available&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Q4] 是否有高质量标注数据？（至少 500-1000 对示例）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="s2">&quot;  数据质量比数量重要&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if_no&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Prompt Engineering&quot;</span><span class="p">,</span> <span class="s2">&quot;数据不足时微调效果差。先优化提示词。&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;cost_unacceptable&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Q5] 当前 API 成本是否显著超出预算？&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="s2">&quot;  计算当前成本 vs 微调小模型自托管成本&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if_yes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Fine-tune for Cost&quot;</span><span class="p">,</span> <span class="s2">&quot;微调小模型替代大模型 API，长期成本可降低 10x。&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="n">scenario_answers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;knowledge_cutoff&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;consistent_format&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;latency_critical&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data_available&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cost_unacceptable&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[演示场景：需要稳定 JSON 输出的客服机器人]&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;explanation&quot;</span><span class="p">])</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">scenario_answers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  回答: </span><span class="si">{</span><span class="s1">&#39;是 (Y)&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">answer</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;y&#39;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;否 (N)&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">answer</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span> <span class="ow">and</span> <span class="s2">&quot;if_yes&quot;</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+            <span class="n">rec_type</span><span class="p">,</span> <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;if_yes&quot;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  推荐方案: [</span><span class="si">{</span><span class="n">rec_type</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  原因: </span><span class="si">{</span><span class="n">rec_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  最终建议: </span><span class="si">{</span><span class="n">rec_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rec_type</span>
+
+        <span class="k">if</span> <span class="n">answer</span> <span class="o">==</span> <span class="s2">&quot;n&quot;</span> <span class="ow">and</span> <span class="s2">&quot;if_no&quot;</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+            <span class="n">rec_type</span><span class="p">,</span> <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;if_no&quot;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  推荐方案: [</span><span class="si">{</span><span class="n">rec_type</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  原因: </span><span class="si">{</span><span class="n">rec_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  最终建议: </span><span class="si">{</span><span class="n">rec_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rec_type</span>
+
+    <span class="k">return</span> <span class="s2">&quot;Prompt Engineering&quot;</span>
+
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">finetune_decision_tree</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">决策结果: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+  LLM 方案选择决策树
+============================================================
+
+[演示场景：需要稳定 JSON 输出的客服机器人]
+
+[Q1] 问题是否因为模型不知道你的私有或最新数据？
+  例如：公司内部文档、产品手册、最新新闻
+  回答: 否 (N)
+
+[Q2] 是否需要高度一致的输出格式？
+  例如：始终输出带特定字段的 JSON
+  回答: 是 (Y)
+
+  推荐方案: [Structured Output]
+  原因: 先试结构化输出（JSON mode）或 function calling。
+
+============================================================
+  最终建议: Structured Output
+============================================================
+
+决策结果: Structured Output
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2">
+<h2>Section 2：提示工程先行<a class="headerlink" href="#section-2" title="Link to this heading">#</a></h2>
+<p>以下三个场景，初看似乎需要微调，但用提示工程就能解决。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>需求</p></th>
+<th class="head"><p>错误直觉</p></th>
+<th class="head"><p>正确方案</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>始终输出 JSON</p></td>
+<td><p>微调</p></td>
+<td><p>JSON mode / structured output</p></td>
+</tr>
+<tr class="row-odd"><td><p>使用领域术语</p></td>
+<td><p>微调</p></td>
+<td><p>Few-shot 示例</p></td>
+</tr>
+<tr class="row-even"><td><p>特定写作风格</p></td>
+<td><p>微调</p></td>
+<td><p>风格示例放入提示词</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 场景 A：始终输出 JSON</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;场景 A：需要稳定的 JSON 输出&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">good_prompt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;分析以下产品评论，严格以 JSON 格式输出，不要有任何额外文字：</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;评论：手机很好用，但电池续航差</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;输出格式：</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s1">&#39;{&quot;sentiment&quot;: &quot;positive|negative|mixed&quot;, &quot;score&quot;: 1-5, &quot;pros&quot;: [...], &quot;cons&quot;: [...]}&#39;</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">good_prompt</span><span class="p">}],</span>
+    <span class="n">response_format</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;json_object&quot;</span><span class="p">},</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+
+<span class="n">result_text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+<span class="n">result_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;提示词方案输出（稳定 JSON）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result_json</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">结论：JSON mode + 明确格式描述，无需微调！&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>场景 A：需要稳定的 JSON 输出
+--------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>提示词方案输出（稳定 JSON）：
+{
+  &quot;sentiment&quot;: &quot;mixed&quot;,
+  &quot;score&quot;: 3,
+  &quot;pros&quot;: [
+    &quot;手机很好用&quot;,
+    &quot;使用体验良好&quot;
+  ],
+  &quot;cons&quot;: [
+    &quot;电池续航差&quot;,
+    &quot;续航不足&quot;
+  ]
+}
+
+结论：JSON mode + 明确格式描述，无需微调！
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 场景 B：使用领域术语</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;场景 B：需要使用特定领域术语&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">fewshot_prompt</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;你是一位心内科医师，用专业医学术语与同行交流。&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;解释一下心衰的诊断标准&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;心力衰竭诊断依据 Framingham 标准，需满足 2 项主要标准。主要标准包括：阵发性夜间呼吸困难、颈静脉怒张、肊部噚音。&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;解释一下心肌棗死的治疗流程&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">fewshot_prompt</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Few-shot 提示词输出（专业术语）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">结论：Few-shot 示例引导术语使用，无需微调！&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>场景 B：需要使用特定领域术语
+--------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Few-shot 提示词输出（专业术语）：
+
+
+结论：Few-shot 示例引导术语使用，无需微调！
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 场景 C：特定写作风格</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;场景 C：需要特定写作风格（简洁、口语化）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">style_system</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;你是一位科技博主，写作风格：</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;1. 句子简短，每句不超过 20 字</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;2. 多用问句开头吸引读者</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;3. 喜欢用「」引号强调重点</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;4. 结尾总是有一个行动呼吁</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;示例文章片段：</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;AI 真的会抗走你的工作吗？答案超出你的想象。</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;不是所有工作都危险。「重复性」工作才是高风险区。</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;现在就学一门 AI 工具，从今天开始。&quot;</span>
+<span class="p">)</span>
+
+<span class="n">style_prompt</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">style_system</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;写一段关于大模型微调的介绍，100字以内&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="n">style_prompt</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">150</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;风格提示词输出：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">结论：把风格示例放入 system prompt，无需微调！&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>场景 C：需要特定写作风格（简洁、口语化）
+--------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>风格提示词输出：
+
+
+结论：把风格示例放入 system prompt，无需微调！
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-3">
+<h2>Section 3：微调真正适合的场景<a class="headerlink" href="#section-3" title="Link to this heading">#</a></h2>
+<p>当提示工程无法解决问题时，以下四种场景是微调的正当理由：</p>
+<section id="id2">
+<h3>1. 极低延迟（需要小模型）<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>大模型 API：p99 延迟 2-5 秒</p></li>
+<li><p>微调后的 7B 小模型自托管：p99 延迟 200-500ms</p></li>
+<li><p><strong>适用</strong>：实时语音、游戏 AI、高频交易辅助</p></li>
+</ul>
+</section>
+<section id="token">
+<h3>2. 大量重复任务的 Token 成本优化<a class="headerlink" href="#token" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>场景：每天 100 万次调用，每次 500 tokens</p></li>
+<li><p>GPT-4o：$2.5/M tokens × 500M = <strong>$1250/天</strong></p></li>
+<li><p>微调 GPT-4o-mini 或自托管 Llama：<strong>$50-100/天</strong></p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>3. 高度专业领域（私有数据）<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>医院内部病历分析系统</p></li>
+<li><p>法律事务所的合同审查</p></li>
+<li><p><strong>特点</strong>：训练数据高度专业，外部模型没见过</p></li>
+</ul>
+</section>
+<section id="api">
+<h3>4. 数据隐私（不能发给 API）<a class="headerlink" href="#api" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>数据合规要求（GDPR、HIPAA）</p></li>
+<li><p>商业机密</p></li>
+<li><p><strong>方案</strong>：在私有环境微调，本地推理</p></li>
+</ul>
+</section>
+</section>
+<section id="section-4">
+<h2>Section 4：成本估算<a class="headerlink" href="#section-4" title="Link to this heading">#</a></h2>
+<p>场景：每天 100 万次请求，每次 500 tokens（300 prompt + 200 completion）</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DAILY_REQUESTS</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+<span class="n">PROMPT_TOKENS</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">COMPLETION_TOKENS</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;GPT-4o (API)&quot;</span><span class="p">,</span> <span class="s2">&quot;input_price&quot;</span><span class="p">:</span> <span class="mf">2.50</span><span class="p">,</span> <span class="s2">&quot;output_price&quot;</span><span class="p">:</span> <span class="mf">10.00</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="s2">&quot;无需维护，按量付费&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;GPT-4o-mini (微调后)&quot;</span><span class="p">,</span> <span class="s2">&quot;input_price&quot;</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">,</span> <span class="s2">&quot;output_price&quot;</span><span class="p">:</span> <span class="mf">1.20</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="s2">&quot;需要微调费用，质量接近 GPT-4o&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Claude 3 Haiku (API)&quot;</span><span class="p">,</span> <span class="s2">&quot;input_price&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s2">&quot;output_price&quot;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="s2">&quot;Anthropic 最快最便宜&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Llama 3 8B (自托管)&quot;</span><span class="p">,</span> <span class="s2">&quot;input_price&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;output_price&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;server_daily_cost&quot;</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="s2">&quot;需要 GPU 服务器&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;场景：每天 </span><span class="si">{</span><span class="n">DAILY_REQUESTS</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> 次请求，每次 </span><span class="si">{</span><span class="n">PROMPT_TOKENS</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">COMPLETION_TOKENS</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;</span><span class="se">\u65b9\u6848</span><span class="s1">&#39;</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;</span><span class="se">\u6bcf\u65e5\u6210\u672c</span><span class="s1">&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;</span><span class="se">\u6bcf\u6708\u6210\u672c</span><span class="s1">&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;</span><span class="se">\u5907\u6ce8</span><span class="s1">&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+
+<span class="n">total_pt</span> <span class="o">=</span> <span class="n">DAILY_REQUESTS</span> <span class="o">*</span> <span class="n">PROMPT_TOKENS</span> <span class="o">/</span> <span class="mi">1_000_000</span>
+<span class="n">total_ct</span> <span class="o">=</span> <span class="n">DAILY_REQUESTS</span> <span class="o">*</span> <span class="n">COMPLETION_TOKENS</span> <span class="o">/</span> <span class="mi">1_000_000</span>
+
+<span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;server_daily_cost&quot;</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+        <span class="n">daily_cost</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;server_daily_cost&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">daily_cost</span> <span class="o">=</span> <span class="n">total_pt</span> <span class="o">*</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;input_price&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">total_ct</span> <span class="o">*</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;output_price&quot;</span><span class="p">]</span>
+    <span class="n">monthly_cost</span> <span class="o">=</span> <span class="n">daily_cost</span> <span class="o">*</span> <span class="mi">30</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">daily_cost</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">monthly_cost</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;notes&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\u5173\u952e\u6d1e\u5bdf\uff1a</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  GPT-4o mini </span><span class="se">\u6bd4</span><span class="s2"> GPT-4o </span><span class="se">\u4fbf\u5b9c\u7ea6</span><span class="s2"> 8-10x&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="se">\u81ea\u6258\u7ba1</span><span class="s2"> Llama </span><span class="se">\u5728</span><span class="s2"> 100</span><span class="se">\u4e07</span><span class="s2">+/</span><span class="se">\u5929</span><span class="s2"> </span><span class="se">\u7684\u89c4\u6a21\u4e0b\u6700\u7ecf\u6d4e</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  </span><span class="se">\u5fae\u8c03\u6210\u672c\uff08\u4e00\u6b21\u6027\uff09\u901a\u5e38\u5728</span><span class="s2"> 2-3 </span><span class="se">\u5929\u7684\u8282\u7701\u5185\u56de\u6536</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>场景：每天 1,000,000 次请求，每次 300+200 tokens
+================================================================================
+方案                                每日成本         每月成本 备注
+--------------------------------------------------------------------------------
+GPT-4o (API)              $  2,750.00 $ 82,500.00  无需维护，按量付费
+GPT-4o-mini (微调后)         $    330.00 $  9,900.00  需要微调费用，质量接近 GPT-4o
+Claude 3 Haiku (API)      $    325.00 $  9,750.00  Anthropic 最快最便宜
+Llama 3 8B (自托管)          $     48.00 $  1,440.00  需要 GPU 服务器
+--------------------------------------------------------------------------------
+
+关键洞察：
+  GPT-4o mini 比 GPT-4o 便宜约 8-10x
+  自托管 Llama 在 100万+/天 的规模下最经济
+  微调成本（一次性）通常在 2-3 天的节省内回收
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-5">
+<h2>Section 5：数据质量比数量重要<a class="headerlink" href="#section-5" title="Link to this heading">#</a></h2>
+<p>微调的效果 80% 取决于数据质量。以下是好数据和坏数据的对比。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bad_examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;problem&quot;</span><span class="p">:</span> <span class="s2">&quot;输入过于模糊&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;帮我写点东西&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;好的，我来帮你写。&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;issue&quot;</span><span class="p">:</span> <span class="s2">&quot;输入没有具体任务，输出没有实际内容&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;problem&quot;</span><span class="p">:</span> <span class="s2">&quot;输出包含错误信息&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;Python 中如何反转字符串？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;用 reverse() 方法：s.reverse()&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;issue&quot;</span><span class="p">:</span> <span class="s2">&quot;str 没有 reverse() 方法，这是错误答案&quot;</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">good_examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="s2">&quot;具体明确的任务&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;用简单语言解释 API，适合非技术读者，100字以内&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;API 就像餐厅的服务员。你（APP）告诉服务员（API）你想要什么，服务员去厨房取来给你。&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;quality_note&quot;</span><span class="p">:</span> <span class="s2">&quot;输入有明确约束，输出有类比、简洁&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="s2">&quot;正确且完整的答案&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;Python 中如何反转字符串？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;Python 反转字符串：</span><span class="se">\n</span><span class="s2">1. 切片：s[::-1]</span><span class="se">\n</span><span class="s2">2. join+reversed</span><span class="se">\n\n</span><span class="s2">推荐用切片。&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;quality_note&quot;</span><span class="p">:</span> <span class="s2">&quot;给出多种方法，有推荐，有示例&quot;</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;坏数据示例：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bad_examples</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[坏例 </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] 问题：</span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;problem&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  输入: </span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  输出: </span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  问题: </span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;issue&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">好数据示例：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">good_examples</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[好例 </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">] 优点：</span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;quality&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  输入: </span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  好在: </span><span class="si">{</span><span class="n">ex</span><span class="p">[</span><span class="s1">&#39;quality_note&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">数据质量检查清单：&quot;</span><span class="p">)</span>
+<span class="n">checklist</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;输入明确具体，有足够上下文&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;输出正确无误，经过人工验证&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;风格一致（格式、语气、长度）&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;覆盖多样的输入变体&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;包含边界情况和困难样本&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;无重复样本（去重）&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">checklist</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>坏数据示例：
+------------------------------------------------------------
+
+[坏例 1] 问题：输入过于模糊
+  输入: 帮我写点东西
+  输出: 好的，我来帮你写。
+  问题: 输入没有具体任务，输出没有实际内容
+
+[坏例 2] 问题：输出包含错误信息
+  输入: Python 中如何反转字符串？
+  输出: 用 reverse() 方法：s.reverse()
+  问题: str 没有 reverse() 方法，这是错误答案
+
+
+好数据示例：
+------------------------------------------------------------
+
+[好例 1] 优点：具体明确的任务
+  输入: 用简单语言解释 API，适合非技术读者，100字以内
+  好在: 输入有明确约束，输出有类比、简洁
+
+[好例 2] 优点：正确且完整的答案
+  输入: Python 中如何反转字符串？
+  好在: 给出多种方法，有推荐，有示例
+
+
+数据质量检查清单：
+  输入明确具体，有足够上下文
+  输出正确无误，经过人工验证
+  风格一致（格式、语气、长度）
+  覆盖多样的输入变体
+  包含边界情况和困难样本
+  无重复样本（去重）
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>总结：微调决策框架<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<section id="id5">
+<h3>核心原则<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<p><strong>先提示工程，后微调。</strong> 微调是最后手段，不是第一选择。</p>
+</section>
+<section id="id6">
+<h3>决策检查清单<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<p><strong>在考虑微调之前，确认已完成：</strong></p>
+<ul class="simple">
+<li><p>[ ] 尝试了详细的 system prompt</p></li>
+<li><p>[ ] 尝试了 few-shot 示例（5-10个）</p></li>
+<li><p>[ ] 尝试了 JSON mode / structured output</p></li>
+<li><p>[ ] 尝试了 RAG（如需私有知识）</p></li>
+<li><p>[ ] 计算了当前 API 成本</p></li>
+</ul>
+<p><strong>微调合理的条件（满足其一）：</strong></p>
+<ul class="simple">
+<li><p>[ ] 延迟要求 &lt; 500ms p99，且 API 无法满足</p></li>
+<li><p>[ ] 每日成本 &gt; $500，且小模型可替代大模型</p></li>
+<li><p>[ ] 数据高度专业，外部模型性能差距 &gt; 20%</p></li>
+<li><p>[ ] 数据合规要求不允许发送给外部 API</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_scenario</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;客服邮件自动分类与回复&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;daily_requests&quot;</span><span class="p">:</span> <span class="mi">50000</span><span class="p">,</span>
+    <span class="s2">&quot;current_model&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;current_daily_cost&quot;</span><span class="p">:</span> <span class="mi">125</span><span class="p">,</span>
+    <span class="s2">&quot;latency_requirement&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt; 3秒&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data_available&quot;</span><span class="p">:</span> <span class="s2">&quot;有6个月历史邮件，剠8000对&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;privacy_requirement&quot;</span><span class="p">:</span> <span class="s2">&quot;邮件含客户信息，敏感度中等&quot;</span>
+<span class="p">}</span>
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;你是一位 LLM 工程顾问。根据以下场景，给出是否需要微调的建议（200字以内）：</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;场景：</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 任务：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;task&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 每日请求量：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;daily_requests&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 当前模型：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;current_model&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 当前每日成本：$</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;current_daily_cost&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 延迟要求：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;latency_requirement&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 可用数据：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;data_available&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;- 隐私要求：</span><span class="si">{</span><span class="n">user_scenario</span><span class="p">[</span><span class="s1">&#39;privacy_requirement&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="s2">&quot;请给出：1) 是否推荐微调 2) 推荐的具体方案 3) 预期收益&quot;</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}],</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;个性化微调建议：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>个性化微调建议：
+============================================================
+1) 推荐微调：是。理由：8000对数据足以显著提升分类与模板化回复效果，并降低调用成本/延迟，前提是做好隐私脱敏与隔离训练。  
+
+2) 方案：两阶段方案——（A）用脱敏数据在可微调的轻量模型（或用 LoRA/adapter 技术在开源大模型上）微调分类器与回复模板化生成；（B）在边缘/私有网络部署分类层，复杂/高敏感度工单回退 gpt-4o。训练留验集、加少量对抗样本，开启加密/访问控制或差分隐私方案。  
+
+3) 预期收益：分类准确率+10–20%，日成本下降约30–50%，端到端延迟更稳定并可达＜3s，人工干预与投诉率下降。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/06_finetuning"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../05_agents/03_multi_agent.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">多 Agent 系统</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_lora.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">第六章：微调 — 02 LoRA 低秩适配微调</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1">Section 1：决策树 — 我需要微调吗？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2">Section 2：提示工程先行</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3">Section 3：微调真正适合的场景</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">1. 极低延迟（需要小模型）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#token">2. 大量重复任务的 Token 成本优化</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3. 高度专业领域（私有数据）</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api">4. 数据隐私（不能发给 API）</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：成本估算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：数据质量比数量重要</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">总结：微调决策框架</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">核心原则</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">决策检查清单</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

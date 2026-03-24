@@ -1,0 +1,1908 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>多 Agent 系统 &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/05_agents/03_multi_agent';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="第六章：微调 — 01 什么时候需要微调？" href="../06_finetuning/01_when_to_finetune.html" />
+    <link rel="prev" title="Agent 记忆系统" href="02_memory.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/05_agents/03_multi_agent.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/05_agents/03_multi_agent.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>多 Agent 系统</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">为什么需要多 Agent？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">常见的多 Agent 模式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-orchestrator-worker">Section 1：Orchestrator-Worker 模式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2-worker">Section 2：并行 Worker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3-pipeline">Section 3：Pipeline（流水线）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4-agent">Section 4：投票表决（多 Agent 共识）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5-agent">Section 5：Agent 间通信协议</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">进阶：完整多 Agent 项目演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">练习题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">总结：何时使用哪种模式？</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">四种模式对比</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">选择建议</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">生产建议</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="agent">
+<h1>多 Agent 系统<a class="headerlink" href="#agent" title="Link to this heading">#</a></h1>
+<section id="id1">
+<h2>为什么需要多 Agent？<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>单个 Agent 能力有限，面对复杂任务时会遇到：</p>
+<ul class="simple">
+<li><p><strong>上下文长度瓶颈</strong>：单次请求能处理的信息有限</p></li>
+<li><p><strong>专业化瓶颈</strong>：一个通用 Agent 无法在所有领域都表现优秀</p></li>
+<li><p><strong>速度瓶颈</strong>：串行执行效率低</p></li>
+</ul>
+<p>解决方案：让多个<strong>专门化 Agent 协作</strong>，各司其职。</p>
+</section>
+<section id="id2">
+<h2>常见的多 Agent 模式<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>模式</p></th>
+<th class="head"><p>结构</p></th>
+<th class="head"><p>适用场景</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Orchestrator-Worker</strong></p></td>
+<td><p>一个主 Agent 调度多个子 Agent</p></td>
+<td><p>需要规划和分工的复杂任务</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Pipeline（流水线）</strong></p></td>
+<td><p>每个 Agent 输出作为下一个的输入</p></td>
+<td><p>有明确处理顺序的任务</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>并行 Worker</strong></p></td>
+<td><p>多个 Agent 同时处理不同子任务</p></td>
+<td><p>可拆分的独立子任务</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>投票表决</strong></p></td>
+<td><p>多个 Agent 独立给出答案，再裁决</p></td>
+<td><p>高风险、需要可靠性的决策</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">drop_params</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;使用模型：</span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># gpt-5/o系列不支持自定义temperature值，统一用安全wrapper</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_c</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">_m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openai/gpt-5&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o1&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o3&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o4&#39;</span><span class="p">)):</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>使用模型：openai/gpt-5-mini
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── 通用 Agent 辅助函数 ────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">agent</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">user_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    单次调用 Agent 的辅助函数。</span>
+
+<span class="sd">    参数：</span>
+<span class="sd">        system_prompt: 定义 Agent 的角色和行为</span>
+<span class="sd">        user_message: 用户输入或上游 Agent 的输出</span>
+<span class="sd">        temperature: 创意度（0=确定性，1=创意）</span>
+<span class="sd">        max_tokens: 最大输出长度</span>
+<span class="sd">        **kwargs: 传递给 litellm.completion 的其他参数</span>
+
+<span class="sd">    返回：</span>
+<span class="sd">        Agent 的文本输出</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">user_message</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+
+<span class="c1"># 快速测试</span>
+<span class="n">test_reply</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是一个助手，用一句话回答。&quot;</span><span class="p">,</span>
+    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;量子计算是什么？&quot;</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;测试输出：</span><span class="si">{</span><span class="n">test_reply</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>测试输出：量子计算是利用量子比特的叠加与纠缠特性，通过对量子态进行量子门操作和测量来执行计算，从而在某些问题上（如因数分解和搜索）显著超越经典计算机的计算能力。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1-orchestrator-worker">
+<h2>Section 1：Orchestrator-Worker 模式<a class="headerlink" href="#section-1-orchestrator-worker" title="Link to this heading">#</a></h2>
+<p><strong>核心思路</strong>：</p>
+<ul class="simple">
+<li><p><strong>Orchestrator</strong>（编排者）：理解任务，制定计划，决定调用哪些 Worker</p></li>
+<li><p><strong>Worker</strong>（执行者）：各有专长，接受指令执行具体工作</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>用户任务
+    ↓
+Orchestrator（规划 + 分配）
+    ├→ ResearchAgent（调研）
+    ├→ WriterAgent（写作）
+    └→ ReviewerAgent（审校）
+    ↓
+最终结果
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Worker Agents 定义 ────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">research_agent</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;调研 Agent：收集和整理关于某个话题的关键事实&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [ResearchAgent] 调研主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个专业的研究员。给定一个主题，提供 3-5 个关键事实和数据。&quot;</span>
+            <span class="s2">&quot;每个事实单独一行，以&#39;-&#39;开头。内容简洁准确。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;请调研：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [ResearchAgent] 完成，输出 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">writer_agent</span><span class="p">(</span><span class="n">research_result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;科普&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;写作 Agent：将调研结果转化为可读的文章&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [WriterAgent] 撰写 </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2"> 风格文章&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;你是一个擅长写</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">文章的作家。&quot;</span>
+            <span class="s2">&quot;将提供的研究资料转化为流畅、易读的文章段落。&quot;</span>
+            <span class="s2">&quot;要有引人入胜的开头，清晰的主体，简洁的结尾。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;基于以下研究资料写一篇文章：</span><span class="se">\n\n</span><span class="si">{</span><span class="n">research_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [WriterAgent] 完成，输出 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reviewer_agent</span><span class="p">(</span><span class="n">article</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;审校 Agent：检查文章质量并给出改进建议&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [ReviewerAgent] 审校文章&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个严格的编辑。审校文章时重点检查：&quot;</span>
+            <span class="s2">&quot;1) 逻辑连贯性 2) 事实准确性 3) 表达清晰度。&quot;</span>
+            <span class="s2">&quot;给出评分（1-10）和具体的改进建议，然后输出修改后的最终版本。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;请审校以下文章：</span><span class="se">\n\n</span><span class="si">{</span><span class="n">article</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [ReviewerAgent] 完成&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># ── Orchestrator Agent ────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">orchestrator_agent</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    编排 Agent：分析任务，输出执行计划（JSON 格式）。</span>
+
+<span class="sd">    返回结构：</span>
+<span class="sd">    {</span>
+<span class="sd">        &quot;plan&quot;: &quot;任务分析...&quot;,</span>
+<span class="sd">        &quot;research_topic&quot;: &quot;调研主题&quot;,</span>
+<span class="sd">        &quot;article_style&quot;: &quot;文章风格&quot;,</span>
+<span class="sd">        &quot;need_review&quot;: true/false</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Orchestrator] 分析任务：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个任务编排者。分析用户的写作任务，输出执行计划。&quot;</span>
+            <span class="s2">&quot;只输出 JSON，格式：&quot;</span>
+            <span class="s1">&#39;{&quot;plan&quot;: &quot;任务分析&quot;, &quot;research_topic&quot;: &quot;调研主题&quot;, &#39;</span>
+            <span class="s1">&#39;&quot;article_style&quot;: &quot;科普/学术/商业&quot;, &quot;need_review&quot;: true}&#39;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">plan</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+        <span class="c1"># 解析失败时使用默认计划</span>
+        <span class="n">plan</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;plan&quot;</span><span class="p">:</span> <span class="s2">&quot;直接执行&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;research_topic&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">,</span>
+            <span class="s2">&quot;article_style&quot;</span><span class="p">:</span> <span class="s2">&quot;科普&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;need_review&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Orchestrator] 计划：</span><span class="si">{</span><span class="n">plan</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">plan</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_orchestrator_pipeline</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;完整的 Orchestrator-Worker 流程&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;任务：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Step 1: 编排者制定计划</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 1] 编排者分析任务...&quot;</span><span class="p">)</span>
+    <span class="n">plan</span> <span class="o">=</span> <span class="n">orchestrator_agent</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: 调研</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 2] 调研 Agent 工作...&quot;</span><span class="p">)</span>
+    <span class="n">research</span> <span class="o">=</span> <span class="n">research_agent</span><span class="p">(</span><span class="n">plan</span><span class="p">[</span><span class="s2">&quot;research_topic&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;调研结果：</span><span class="se">\n</span><span class="si">{</span><span class="n">research</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Step 3: 写作</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 3] 写作 Agent 工作...&quot;</span><span class="p">)</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">writer_agent</span><span class="p">(</span><span class="n">research</span><span class="p">,</span> <span class="n">plan</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;article_style&quot;</span><span class="p">,</span> <span class="s2">&quot;科普&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">初稿：</span><span class="se">\n</span><span class="si">{</span><span class="n">article</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Step 4: 审校（如果需要）</span>
+    <span class="k">if</span> <span class="n">plan</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;need_review&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 4] 审校 Agent 工作...&quot;</span><span class="p">)</span>
+        <span class="n">final</span> <span class="o">=</span> <span class="n">reviewer_agent</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最终版本：</span><span class="se">\n</span><span class="si">{</span><span class="n">final</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">final</span>
+
+    <span class="k">return</span> <span class="n">article</span>
+
+
+<span class="c1"># 运行演示</span>
+<span class="n">final_article</span> <span class="o">=</span> <span class="n">run_orchestrator_pipeline</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;写一篇关于量子计算的简短科普文章，面向普通读者&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+任务：写一篇关于量子计算的简短科普文章，面向普通读者
+============================================================
+
+[Phase 1] 编排者分析任务...
+  [Orchestrator] 分析任务：写一篇关于量子计算的简短科普文章，面向普通读者
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [Orchestrator] 计划：{&#39;plan&#39;: &#39;直接执行&#39;, &#39;research_topic&#39;: &#39;写一篇关于量子计算的简短科普文章，面向普通读者&#39;, &#39;article_style&#39;: &#39;科普&#39;, &#39;need_review&#39;: True}
+
+[Phase 2] 调研 Agent 工作...
+  [ResearchAgent] 调研主题：写一篇关于量子计算的简短科普文章，面向普通读者
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [ResearchAgent] 完成，输出 0 字
+调研结果：
+
+
+[Phase 3] 写作 Agent 工作...
+  [WriterAgent] 撰写 科普 风格文章
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [WriterAgent] 完成，输出 0 字
+
+初稿：
+
+
+[Phase 4] 审校 Agent 工作...
+  [ReviewerAgent] 审校文章
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [ReviewerAgent] 完成
+
+最终版本：
+你还没粘贴文章内容。请把要审校的全文粘到这里，或上传文件/给出链接。
+
+在你提交文章前，请选择或告知（可选）：
+- 目标读者与语气（例如：学术/通俗/商务/新闻/博客）；
+- 是否需要保留原作者风格（还是更改为更正式/简洁）；
+- 是否要同时检查格式、引用和标点（还是只关注逻辑、事实与表达）；
+- 是否需要同时输出“逐句修改对照”（track changes）或仅提供最终修改后版本。
+
+收到文章后我会按你要求：
+1) 给出1–10分的总体评分并说明评分理由；
+2) 针对逻辑连贯性、事实准确性、表达清晰度给出具体改进建议（逐条）；
+3) 输出修改后的最终版本（根据你是否要保留原风格调整语言）。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2-worker">
+<h2>Section 2：并行 Worker<a class="headerlink" href="#section-2-worker" title="Link to this heading">#</a></h2>
+<p>当多个子任务相互独立时，串行执行会浪费时间。
+使用 <code class="docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code> 可以让多个 Agent <strong>并发运行</strong>。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    ┌─→ 调研主题 A ─┐
+用户任务 → 拆分任务 ─┼─→ 调研主题 B ─┼─→ 综合 Agent → 最终结果
+                    └─→ 调研主题 C ─┘
+                    （三个 Agent 同时运行）
+</pre></div>
+</div>
+<p><strong>注意</strong>：线程并发对 I/O 密集型任务（API 调用）效果显著，对 CPU 密集型任务需用多进程。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parallel_research</span><span class="p">(</span><span class="n">topics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    并行调研多个主题。</span>
+
+<span class="sd">    参数：</span>
+<span class="sd">        topics: 要调研的主题列表</span>
+<span class="sd">        max_workers: 最大并发线程数</span>
+
+<span class="sd">    返回：</span>
+<span class="sd">        {topic: research_result} 字典</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">research_one</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [并行] 开始调研：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是一个专业研究员。用 2-3 句话概括这个主题的核心内容。&quot;</span><span class="p">,</span>
+            <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;简要介绍：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [并行] 完成调研：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">topic</span><span class="p">,</span> <span class="n">result</span>
+
+    <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">research_one</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">topics</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">topic</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">topic</span> <span class="o">=</span> <span class="n">futures</span><span class="p">[</span><span class="n">future</span><span class="p">]</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;调研失败：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">synthesize_agent</span><span class="p">(</span><span class="n">research_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">synthesis_goal</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;综合 Agent：将多个调研结果整合为连贯输出&quot;&quot;&quot;</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;【</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">】</span><span class="se">\n</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">topic</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">research_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个善于综合归纳的分析师。&quot;</span>
+            <span class="s2">&quot;将多个来源的信息整合为结构清晰的综合报告。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;综合目标：</span><span class="si">{</span><span class="n">synthesis_goal</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">各主题调研结果：</span><span class="se">\n</span><span class="si">{</span><span class="n">combined</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># ── 演示：并行调研 3 个主题 ──────────────────────────────</span>
+<span class="n">topics</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;量子计算的基本原理&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;量子计算的当前应用&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;量子计算面临的技术挑战&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;并行 Worker 演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;同时调研 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个主题...</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">research_results</span> <span class="o">=</span> <span class="n">parallel_research</span><span class="p">(</span><span class="n">topics</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">parallel_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">并行耗时：</span><span class="si">{</span><span class="n">parallel_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> 秒&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">各主题调研结果：&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">topic</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">research_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 综合所有结果</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">综合 Agent 整合结果...&quot;</span><span class="p">)</span>
+<span class="n">synthesis</span> <span class="o">=</span> <span class="n">synthesize_agent</span><span class="p">(</span><span class="n">research_results</span><span class="p">,</span> <span class="s2">&quot;量子计算综合报告&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">综合报告：</span><span class="se">\n</span><span class="si">{</span><span class="n">synthesis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>并行 Worker 演示
+==================================================
+同时调研 3 个主题...
+
+  [并行] 开始调研：量子计算的基本原理
+  [并行] 开始调研：量子计算的当前应用
+  [并行] 开始调研：量子计算面临的技术挑战
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [并行] 完成调研：量子计算的基本原理
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [并行] 完成调研：量子计算的当前应用
+  [并行] 完成调研：量子计算面临的技术挑战
+
+并行耗时：4.0 秒
+
+各主题调研结果：
+
+[量子计算的基本原理]
+
+
+[量子计算的当前应用]
+
+
+[量子计算面临的技术挑战]
+
+
+综合 Agent 整合结果...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>综合报告：
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-3-pipeline">
+<h2>Section 3：Pipeline（流水线）<a class="headerlink" href="#section-3-pipeline" title="Link to this heading">#</a></h2>
+<p>流水线模式中，每个 Agent 是一个处理阶段，前一个 Agent 的输出直接成为下一个的输入。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>用户输入
+  → [Planner]    制定大纲
+  → [Researcher] 补充素材
+  → [Writer]     撰写文章
+  → [Editor]     润色优化
+  → 最终输出
+</pre></div>
+</div>
+<p>每个阶段都能看到前面所有阶段的工作，确保连贯性。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pipeline</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    流水线多 Agent 系统。</span>
+
+<span class="sd">    每个阶段接收上一阶段的输出，加工后传给下一阶段。</span>
+<span class="sd">    支持记录每个阶段的中间结果。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stages</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># [(name, system_prompt, temperature, max_tokens)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># 记录每阶段输出</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_stage</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Pipeline&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;添加流水线阶段（支持链式调用）&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stages</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># 支持链式调用</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;运行完整流水线&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">current_input</span> <span class="o">=</span> <span class="n">initial_input</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;流水线输入：</span><span class="si">{</span><span class="n">initial_input</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;阶段数：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stages</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stages</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[阶段 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stages</span><span class="p">)</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  输入（前 100 字）：</span><span class="si">{</span><span class="n">current_input</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_input</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;  输入：</span><span class="si">{</span><span class="n">current_input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">output</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+                <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="n">current_input</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+                <span class="n">max_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+            <span class="n">current_input</span> <span class="o">=</span> <span class="n">output</span>  <span class="c1"># 输出成为下一阶段的输入</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  输出（前 150 字）：</span><span class="si">{</span><span class="n">output</span><span class="p">[:</span><span class="mi">150</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">150</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;  输出：</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">current_input</span>  <span class="c1"># 最后一个阶段的输出</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stage_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;获取指定阶段的输出&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">stage_name</span><span class="p">,</span> <span class="s2">&quot;该阶段未执行&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># ── 构建写作流水线 ─────────────────────────────────────────</span>
+<span class="n">writing_pipeline</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Pipeline</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Planner&quot;</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个内容规划师。根据用户的写作需求，制定一个详细的文章大纲。&quot;</span>
+            <span class="s2">&quot;大纲包含：标题、引言要点、3个主体段落的要点、结论要点。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Researcher&quot;</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个内容研究员。基于提供的文章大纲，为每个部分补充具体的事实、&quot;</span>
+            <span class="s2">&quot;数据、例子，让文章内容更加充实。输出增强后的大纲（保留原结构）。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Writer&quot;</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一位优秀的科普作家。将提供的内容大纲扩展成一篇完整的文章。&quot;</span>
+            <span class="s2">&quot;文章要语言流畅、通俗易懂，避免过多专业术语。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Editor&quot;</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一位资深编辑。润色文章：修正语法错误，改善句子流畅度，&quot;</span>
+            <span class="s2">&quot;确保逻辑连贯，去除冗余表达。输出最终优化版本。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># 运行流水线</span>
+<span class="n">final_output</span> <span class="o">=</span> <span class="n">writing_pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">initial_input</span><span class="o">=</span><span class="s2">&quot;写一篇关于人工智能在医疗领域应用的科普文章，面向普通大众&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;流水线完成！各阶段输出已记录。&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最终文章字数：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">final_output</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+流水线输入：写一篇关于人工智能在医疗领域应用的科普文章，面向普通大众
+阶段数：4
+============================================================
+
+[阶段 1/4] Planner
+  输入：写一篇关于人工智能在医疗领域应用的科普文章，面向普通大众
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  输出：
+
+[阶段 2/4] Researcher
+  输入：
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  输出：
+
+[阶段 3/4] Writer
+  输入：
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  输出（前 150 字）：我需要你把大纲贴过来，才能把它扩展开成完整文章。请把大纲内容粘贴在下一条消息里，同时告诉我以下几点偏好（可选，但有助于我更精准地写）：
+
+- 主题/领域（如果大纲里没有明确写出）
+- 目标读者（比如中学生、普通大众、大学生、科普爱好者等）
+- 预计字数或篇幅（例如 500、1000、2000 字）
+...
+
+[阶段 4/4] Editor
+  输入（前 100 字）：我需要你把大纲贴过来，才能把它扩展开成完整文章。请把大纲内容粘贴在下一条消息里，同时告诉我以下几点偏好（可选，但有助于我更精准地写）：
+
+- 主题/领域（如果大纲里没有明确写出）
+- 目标读者（比如中...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  输出：
+
+============================================================
+流水线完成！各阶段输出已记录。
+最终文章字数：0 字
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-4-agent">
+<h2>Section 4：投票表决（多 Agent 共识）<a class="headerlink" href="#section-4-agent" title="Link to this heading">#</a></h2>
+<p>对于<strong>高风险决策</strong>，单个 Agent 的答案可能有偏差。
+让多个 Agent 独立回答，再由 Judge Agent 综合判断，能提高可靠性。</p>
+<p>适用场景：</p>
+<ul class="simple">
+<li><p>医疗建议</p></li>
+<li><p>法律分析</p></li>
+<li><p>重要的商业决策</p></li>
+<li><p>试题解答验证</p></li>
+</ul>
+<p><strong>设置较高的 temperature</strong> 让每个 Agent 独立思考，避免趋同。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">voting_agents</span><span class="p">(</span>
+    <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">num_voters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">voter_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">voter_system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;你是一个专家，请独立、认真地回答问题。&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    让多个 Agent 独立回答同一问题。</span>
+
+<span class="sd">    参数：</span>
+<span class="sd">        question: 要回答的问题</span>
+<span class="sd">        num_voters: 投票 Agent 数量</span>
+<span class="sd">        voter_temperature: 投票者的创意度（高温度 = 更多样化）</span>
+
+<span class="sd">    返回：</span>
+<span class="sd">        {&quot;question&quot;: ..., &quot;answers&quot;: [...], &quot;judge_result&quot;: ...}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;问题：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;投票 Agent 数：</span><span class="si">{</span><span class="n">num_voters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 并行获取多个答案</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_answer</span><span class="p">(</span><span class="n">agent_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Agent-</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">] 独立思考中...&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="n">voter_system</span><span class="p">,</span>
+            <span class="n">user_message</span><span class="o">=</span><span class="n">question</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">voter_temperature</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Agent-</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">] 完成&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">num_voters</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">get_answer</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_voters</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">future</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">)):</span>
+            <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+
+    <span class="c1"># 打印各 Agent 答案</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">各 Agent 的独立答案：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ans</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">answers</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Agent-</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="si">{</span><span class="n">ans</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Judge Agent 综合裁决</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[JudgeAgent] 综合裁决中...&quot;</span><span class="p">)</span>
+    <span class="n">answers_text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;答案 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">：</span><span class="si">{</span><span class="n">ans</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ans</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">judge_result</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是一个公正的裁判。评估多个专家对同一问题的回答，&quot;</span>
+            <span class="s2">&quot;指出各答案的优缺点，然后综合所有观点给出最佳答案。&quot;</span>
+            <span class="s2">&quot;格式：</span><span class="se">\n</span><span class="s2">评估：（各答案分析）</span><span class="se">\n</span><span class="s2">最佳答案：（综合后的答案）&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;问题：</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">answers_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[JudgeAgent] 裁决结果：</span><span class="se">\n</span><span class="si">{</span><span class="n">judge_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">,</span>
+        <span class="s2">&quot;answers&quot;</span><span class="p">:</span> <span class="n">answers</span><span class="p">,</span>
+        <span class="s2">&quot;judge_result&quot;</span><span class="p">:</span> <span class="n">judge_result</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="c1"># 演示：高风险决策场景</span>
+<span class="n">vote_result</span> <span class="o">=</span> <span class="n">voting_agents</span><span class="p">(</span>
+    <span class="n">question</span><span class="o">=</span><span class="s2">&quot;一家初创公司应该优先融资还是保持盈利？请给出建议和理由。&quot;</span><span class="p">,</span>
+    <span class="n">num_voters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">voter_temperature</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">voter_system</span><span class="o">=</span><span class="s2">&quot;你是一个有丰富经验的创业顾问，根据你的独立判断回答。&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+问题：一家初创公司应该优先融资还是保持盈利？请给出建议和理由。
+投票 Agent 数：3
+============================================================
+  [Agent-1] 独立思考中...
+  [Agent-2] 独立思考中...
+  [Agent-3] 独立思考中...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [Agent-2] 完成
+  [Agent-3] 完成
+  [Agent-1] 完成
+
+各 Agent 的独立答案：
+
+[Agent-1]
+
+
+[Agent-2]
+
+
+[Agent-3]
+
+
+[JudgeAgent] 综合裁决中...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[JudgeAgent] 裁决结果：
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-5-agent">
+<h2>Section 5：Agent 间通信协议<a class="headerlink" href="#section-5-agent" title="Link to this heading">#</a></h2>
+<p>当 Agent 数量增多，需要一个标准化的消息格式来管理 Agent 间通信。</p>
+<p>简单的消息格式：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;agent_name&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;agent_name&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;request|response|error|broadcast&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;消息内容&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">...</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;priority&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">...</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>这是 AutoGen、CrewAI 等框架的基础思想。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">time_module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentMessage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent 间通信的标准消息格式&quot;&quot;&quot;</span>
+    <span class="n">from_agent</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">to_agent</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">msg_type</span><span class="p">:</span> <span class="nb">str</span>          <span class="c1"># request | response | error | broadcast</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time_module</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">message_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;msg_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time_module</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span>
+            <span class="s2">&quot;from&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_agent</span><span class="p">,</span>
+            <span class="s2">&quot;to&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_agent</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_type</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+        <span class="p">}</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MessageBus</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    简单的消息总线：Agent 通过消息总线通信。</span>
+<span class="sd">    所有消息都会被记录，便于调试和追溯。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentMessage</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="nb">callable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;注册 Agent 的消息处理函数&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">[</span><span class="n">agent_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [MessageBus] 注册 Agent：</span><span class="si">{</span><span class="n">agent_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;发送消息并返回目标 Agent 的响应&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [MessageBus] </span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">from_agent</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">to_agent</span><span class="si">}</span><span class="s2">: &quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">msg_type</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">[:</span><span class="mi">60</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">to_agent</span> <span class="o">==</span> <span class="s2">&quot;broadcast&quot;</span><span class="p">:</span>
+            <span class="c1"># 广播给所有 Agent</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="n">message</span><span class="o">.</span><span class="n">from_agent</span><span class="p">:</span>
+                    <span class="n">handler</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">to_agent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handler</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">handler</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;错误：Agent &#39;</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">to_agent</span><span class="si">}</span><span class="s2">&#39; 不存在&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;获取完整消息日志&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">]</span>
+
+
+<span class="c1"># ── 构建基于消息总线的多 Agent 系统 ──────────────────────</span>
+
+<span class="n">bus</span> <span class="o">=</span> <span class="n">MessageBus</span><span class="p">()</span>
+
+<span class="c1"># 定义各 Agent 的消息处理逻辑</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_analyst_request</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;分析师 Agent：分析数据，返回洞察&quot;&quot;&quot;</span>
+    <span class="n">analysis</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是一个数据分析师，从数据中提炼关键洞察。简洁回答。&quot;</span><span class="p">,</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">analysis</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_writer_request</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;写作 Agent：将分析结果写成报告&quot;&quot;&quot;</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是一个报告撰写专家，将数据洞察转化为清晰的报告段落。&quot;</span><span class="p">,</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">report</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_manager_request</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;经理 Agent：做出最终决策&quot;&quot;&quot;</span>
+    <span class="n">decision</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是一个决策者，基于报告给出行动建议。用 1-3 个要点列出。&quot;</span><span class="p">,</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">decision</span>
+
+
+<span class="c1"># 注册 Agent</span>
+<span class="n">bus</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;Analyst&quot;</span><span class="p">,</span> <span class="n">handle_analyst_request</span><span class="p">)</span>
+<span class="n">bus</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;Writer&quot;</span><span class="p">,</span> <span class="n">handle_writer_request</span><span class="p">)</span>
+<span class="n">bus</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;Manager&quot;</span><span class="p">,</span> <span class="n">handle_manager_request</span><span class="p">)</span>
+
+<span class="c1"># 模拟 Agent 间通信流程</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Agent 间通信协议演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">raw_data</span> <span class="o">=</span> <span class="s2">&quot;上月销售额：100万，本月：85万，环比下降 15%。主要下降来自华东区。&quot;</span>
+
+<span class="c1"># 1. 协调者发送分析请求给分析师</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">AgentMessage</span><span class="p">(</span>
+    <span class="n">from_agent</span><span class="o">=</span><span class="s2">&quot;Coordinator&quot;</span><span class="p">,</span>
+    <span class="n">to_agent</span><span class="o">=</span><span class="s2">&quot;Analyst&quot;</span><span class="p">,</span>
+    <span class="n">msg_type</span><span class="o">=</span><span class="s2">&quot;request&quot;</span><span class="p">,</span>
+    <span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;请分析以下销售数据：</span><span class="si">{</span><span class="n">raw_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">分析师回复：</span><span class="si">{</span><span class="n">analysis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 2. 协调者将分析结果发给写作 Agent</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">AgentMessage</span><span class="p">(</span>
+    <span class="n">from_agent</span><span class="o">=</span><span class="s2">&quot;Coordinator&quot;</span><span class="p">,</span>
+    <span class="n">to_agent</span><span class="o">=</span><span class="s2">&quot;Writer&quot;</span><span class="p">,</span>
+    <span class="n">msg_type</span><span class="o">=</span><span class="s2">&quot;request&quot;</span><span class="p">,</span>
+    <span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;将以下分析写成简报：</span><span class="si">{</span><span class="n">analysis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">写作 Agent 简报：</span><span class="si">{</span><span class="n">report</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. 协调者发给经理做决策</span>
+<span class="n">decision</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">AgentMessage</span><span class="p">(</span>
+    <span class="n">from_agent</span><span class="o">=</span><span class="s2">&quot;Coordinator&quot;</span><span class="p">,</span>
+    <span class="n">to_agent</span><span class="o">=</span><span class="s2">&quot;Manager&quot;</span><span class="p">,</span>
+    <span class="n">msg_type</span><span class="o">=</span><span class="s2">&quot;request&quot;</span><span class="p">,</span>
+    <span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;基于以下简报，给出行动建议：</span><span class="si">{</span><span class="n">report</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">经理决策：</span><span class="si">{</span><span class="n">decision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 查看消息日志</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">消息总线日志：&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">log_entry</span> <span class="ow">in</span> <span class="n">bus</span><span class="o">.</span><span class="n">get_log</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">log_entry</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">log_entry</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">log_entry</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">log_entry</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">][:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [MessageBus] 注册 Agent：Analyst
+  [MessageBus] 注册 Agent：Writer
+  [MessageBus] 注册 Agent：Manager
+
+Agent 间通信协议演示
+==================================================
+  [MessageBus] Coordinator → Analyst: [request] 请分析以下销售数据：上月销售额：100万，本月：85万，环比下降 15%。主要下降来自华东区。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>分析师回复：
+  [MessageBus] Coordinator → Writer: [request] 将以下分析写成简报：
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>写作 Agent 简报：
+  [MessageBus] Coordinator → Manager: [request] 基于以下简报，给出行动建议：
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>经理决策：
+
+消息总线日志：
+  [Coordinator → Analyst] request: 请分析以下销售数据：上月销售额：100万，本月：85万，环比下降 15%。主要下降来自华东区。...
+  [Coordinator → Writer] request: 将以下分析写成简报：...
+  [Coordinator → Manager] request: 基于以下简报，给出行动建议：...
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2>进阶：完整多 Agent 项目演示<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>将以上所有模式组合，构建一个「智能内容生产系统」：</p>
+<ul class="simple">
+<li><p>并行调研多个子主题</p></li>
+<li><p>流水线处理（规划→研究→写作→编辑）</p></li>
+<li><p>投票选出最佳标题</p></li>
+<li><p>消息总线协调所有通信</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">content_production_system</span><span class="p">(</span><span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    完整的多 Agent 内容生产系统。</span>
+
+<span class="sd">    流程：</span>
+<span class="sd">    1. [规划 Agent] 将主题拆分为 3 个子主题</span>
+<span class="sd">    2. [并行调研] 同时调研所有子主题</span>
+<span class="sd">    3. [写作 Agent] 整合调研写成文章</span>
+<span class="sd">    4. [标题投票] 3 个 Agent 各提供标题，选最佳</span>
+<span class="sd">    5. 输出最终文章</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;内容生产系统 - 主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Phase 1: 规划 - 拆分子主题</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 1] 规划 Agent 拆分主题...&quot;</span><span class="p">)</span>
+    <span class="n">subtopics_raw</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是内容规划师。将主题拆分为 3 个子主题，以 JSON 数组输出。&quot;</span>
+            <span class="s2">&quot;示例：[</span><span class="se">\&quot;</span><span class="s2">子主题1</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">子主题2</span><span class="se">\&quot;</span><span class="s2">, </span><span class="se">\&quot;</span><span class="s2">子主题3</span><span class="se">\&quot;</span><span class="s2">]&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">subtopics_raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subtopics</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subtopics</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">subtopics</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">的基础&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">的应用&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">的未来&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;子主题：</span><span class="si">{</span><span class="n">subtopics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Phase 2: 并行调研所有子主题</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 2] 并行调研子主题...&quot;</span><span class="p">)</span>
+    <span class="n">research_data</span> <span class="o">=</span> <span class="n">parallel_research</span><span class="p">(</span><span class="n">subtopics</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># Phase 3: 写作整合</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 3] 写作 Agent 整合内容...&quot;</span><span class="p">)</span>
+    <span class="n">combined_research</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;【</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">】</span><span class="se">\n</span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">sub</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">research_data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">article_body</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是科普作家，将多个研究片段整合为连贯的文章正文（不含标题）。&quot;</span><span class="p">,</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">研究资料：</span><span class="se">\n</span><span class="si">{</span><span class="n">combined_research</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Phase 4: 标题投票</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Phase 4] 标题投票...&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_title</span><span class="p">(</span><span class="n">agent_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是标题策划师，为文章起一个吸引眼球的标题（20字以内）。只输出标题本身。&quot;</span><span class="p">,</span>
+            <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;文章主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="se">\n</span><span class="s2">文章正文（摘要）：</span><span class="si">{</span><span class="n">article_body</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">title_futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">get_title</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">candidate_titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">title_futures</span><span class="p">)]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;候选标题：</span><span class="si">{</span><span class="n">candidate_titles</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">best_title</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;你是编辑，从候选标题中选出最佳的一个。只输出标题本身。&quot;</span><span class="p">,</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;候选标题：</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">candidate_titles</span><span class="p">,</span><span class="w"> </span><span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">文章主题：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最佳标题：</span><span class="si">{</span><span class="n">best_title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 组合最终文章</span>
+    <span class="n">final_article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">best_title</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">article_body</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;最终文章：&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">final_article</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">final_article</span>
+
+
+<span class="c1"># 运行完整演示</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">content_production_system</span><span class="p">(</span><span class="s2">&quot;人工智能对教育的影响&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+内容生产系统 - 主题：人工智能对教育的影响
+============================================================
+
+[Phase 1] 规划 Agent 拆分主题...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>子主题：[&#39;个性化学习与教学技术&#39;, &#39;教师角色转变与专业发展&#39;, &#39;教育公平、隐私与伦理挑战&#39;]
+
+[Phase 2] 并行调研子主题...
+  [并行] 开始调研：个性化学习与教学技术
+  [并行] 开始调研：教师角色转变与专业发展
+  [并行] 开始调研：教育公平、隐私与伦理挑战
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [并行] 完成调研：个性化学习与教学技术
+  [并行] 完成调研：教育公平、隐私与伦理挑战
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [并行] 完成调研：教师角色转变与专业发展
+
+[Phase 3] 写作 Agent 整合内容...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Phase 4] 标题投票...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>候选标题：[&#39;&#39;, &#39;&#39;, &#39;&#39;]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最佳标题：
+
+============================================================
+最终文章：
+# 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>练习题<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>扩展 Orchestrator</strong>：让 Orchestrator 能够动态决定调用哪些 Worker，而不是固定流程。提示：让 Orchestrator 返回 <code class="docutils literal notranslate"><span class="pre">{&quot;workers&quot;:</span> <span class="pre">[&quot;research&quot;,</span> <span class="pre">&quot;writer&quot;]}</span></code> 格式的计划。</p></li>
+<li><p><strong>错误容忍的并行 Worker</strong>：当某个 Worker 失败时，Pipeline 应该能够跳过或用备选 Agent 重试。修改 <code class="docutils literal notranslate"><span class="pre">parallel_research</span></code> 添加重试逻辑。</p></li>
+<li><p><strong>加权投票</strong>：在投票表决中，根据每个 Agent 的历史准确率给它们不同的权重。如何追踪和更新 Agent 的历史表现？</p></li>
+<li><p><strong>自适应 Pipeline</strong>：设计一个 Pipeline，其中每个阶段可以决定「需要返回上一阶段修改」（类似人类审稿流程中的返修）。</p></li>
+</ol>
+</section>
+<section id="id5">
+<h2>总结：何时使用哪种模式？<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<section id="id6">
+<h3>四种模式对比<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>模式</p></th>
+<th class="head"><p>适用场景</p></th>
+<th class="head"><p>优点</p></th>
+<th class="head"><p>缺点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Orchestrator-Worker</strong></p></td>
+<td><p>需要规划和协调的复杂任务</p></td>
+<td><p>灵活，可动态分配</p></td>
+<td><p>Orchestrator 是单点故障</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>并行 Worker</strong></p></td>
+<td><p>可拆分的独立子任务</p></td>
+<td><p>速度快，效率高</p></td>
+<td><p>结果需要额外整合</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Pipeline</strong></p></td>
+<td><p>有明确处理顺序的任务</p></td>
+<td><p>逻辑清晰，易维护</p></td>
+<td><p>串行，速度较慢</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>投票表决</strong></p></td>
+<td><p>高风险、需要可靠性的决策</p></td>
+<td><p>减少单一偏差，更可靠</p></td>
+<td><p>成本高（N 倍 API 调用）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id7">
+<h3>选择建议<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>任务能否拆分为独立子任务？
+  是 → 用并行 Worker（速度优先）
+  否 ↓
+任务有固定处理顺序？
+  是 → 用 Pipeline
+  否 ↓
+需要高可靠性？
+  是 → 用投票表决
+  否 → 用 Orchestrator-Worker
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>生产建议<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>设置超时和重试机制（网络不稳定时 Agent 调用可能失败）</p></li>
+<li><p>记录所有 Agent 的输入输出（便于调试和成本分析）</p></li>
+<li><p>控制并发数量（避免触发 API 速率限制）</p></li>
+<li><p>使用 <code class="docutils literal notranslate"><span class="pre">asyncio</span></code> 替代 <code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code> 获得更好的并发性能</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 模式选择速查工具</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">recommend_pattern</span><span class="p">(</span><span class="n">task_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;根据任务描述推荐多 Agent 模式&quot;&quot;&quot;</span>
+    <span class="n">recommendation</span> <span class="o">=</span> <span class="n">agent</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;你是多 Agent 系统架构专家。根据任务描述，推荐最合适的 Agent 模式。&quot;</span>
+            <span class="s2">&quot;可选模式：Orchestrator-Worker、并行 Worker、Pipeline、投票表决。&quot;</span>
+            <span class="s2">&quot;给出推荐和理由（50字以内）。&quot;</span>
+        <span class="p">),</span>
+        <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;任务：</span><span class="si">{</span><span class="n">task_description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">recommendation</span>
+
+
+<span class="c1"># 测试几个典型场景</span>
+<span class="n">test_tasks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;分析多份财务报表，判断公司是否值得投资&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;将一篇英文论文翻译成中文，再进行技术校对&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;同时收集 10 个城市的天气数据做对比分析&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;生成一篇复杂的市场调研报告，需要规划、数据收集、分析、写作&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;多 Agent 模式推荐工具&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">test_tasks</span><span class="p">:</span>
+    <span class="n">rec</span> <span class="o">=</span> <span class="n">recommend_pattern</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">任务：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;推荐：</span><span class="si">{</span><span class="n">rec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>多 Agent 模式推荐工具
+==================================================
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>任务：分析多份财务报表，判断公司是否值得投资
+推荐：推荐：Orchestrator-Worker。理由：协调专长子Agent并综合多份报表分析结论。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>任务：将一篇英文论文翻译成中文，再进行技术校对
+推荐：推荐：Pipeline。理由：分阶段先翻译再技术校对，职责清晰，易衔接。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>任务：同时收集 10 个城市的天气数据做对比分析
+推荐：
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>任务：生成一篇复杂的市场调研报告，需要规划、数据收集、分析、写作
+推荐：
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 知识检验：多 Agent 系统成本估算</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_cost</span><span class="p">(</span><span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_agents</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">turns</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;估算不同多 Agent 模式的 API 调用次数&quot;&quot;&quot;</span>
+    <span class="n">estimates</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Orchestrator-Worker&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;调用次数公式&quot;</span><span class="p">:</span> <span class="s2">&quot;1（编排）+ num_workers（执行）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;调用次数&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">num_agents</span><span class="p">,</span>
+            <span class="s2">&quot;并发性&quot;</span><span class="p">:</span> <span class="s2">&quot;Worker 可并行&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;Pipeline&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;调用次数公式&quot;</span><span class="p">:</span> <span class="s2">&quot;num_stages（串行）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;调用次数&quot;</span><span class="p">:</span> <span class="n">num_agents</span><span class="p">,</span>
+            <span class="s2">&quot;并发性&quot;</span><span class="p">:</span> <span class="s2">&quot;串行&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;并行Worker&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;调用次数公式&quot;</span><span class="p">:</span> <span class="s2">&quot;num_workers + 1（整合）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;调用次数&quot;</span><span class="p">:</span> <span class="n">num_agents</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;并发性&quot;</span><span class="p">:</span> <span class="s2">&quot;全部并行&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;投票表决&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;调用次数公式&quot;</span><span class="p">:</span> <span class="s2">&quot;num_voters + 1（裁判）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;调用次数&quot;</span><span class="p">:</span> <span class="n">num_agents</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;并发性&quot;</span><span class="p">:</span> <span class="s2">&quot;投票者可并行&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">estimates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;错误&quot;</span><span class="p">:</span> <span class="s2">&quot;未知模式&quot;</span><span class="p">})</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;各模式 API 调用次数对比（5个Agent，单轮任务）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Orchestrator-Worker&quot;</span><span class="p">,</span> <span class="s2">&quot;Pipeline&quot;</span><span class="p">,</span> <span class="s2">&quot;并行Worker&quot;</span><span class="p">,</span> <span class="s2">&quot;投票表决&quot;</span><span class="p">]:</span>
+    <span class="n">est</span> <span class="o">=</span> <span class="n">estimate_cost</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">num_agents</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">turns</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">est</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>各模式 API 调用次数对比（5个Agent，单轮任务）
+==================================================
+
+Orchestrator-Worker
+  调用次数公式: 1（编排）+ num_workers（执行）
+  调用次数: 6
+  并发性: Worker 可并行
+
+Pipeline
+  调用次数公式: num_stages（串行）
+  调用次数: 5
+  并发性: 串行
+
+并行Worker
+  调用次数公式: num_workers + 1（整合）
+  调用次数: 6
+  并发性: 全部并行
+
+投票表决
+  调用次数公式: num_voters + 1（裁判）
+  调用次数: 6
+  并发性: 投票者可并行
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 本章总结</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;第 5 章 Agent 系统 - 学习路径总结&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">chapters</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;01_react.ipynb&quot;</span><span class="p">,</span>       <span class="s2">&quot;ReAct 模式&quot;</span><span class="p">,</span>    <span class="s2">&quot;Thought→Action→Observation 循环&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;02_memory.ipynb&quot;</span><span class="p">,</span>      <span class="s2">&quot;Agent 记忆&quot;</span><span class="p">,</span>    <span class="s2">&quot;滑动窗口/摘要/实体/向量记忆&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;03_multi_agent.ipynb&quot;</span><span class="p">,</span> <span class="s2">&quot;多 Agent 系统&quot;</span><span class="p">,</span> <span class="s2">&quot;Orchestrator/Pipeline/投票/消息总线&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">fn</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">chapters</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">下一步建议：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - 尝试将 ReAct + 记忆 + 多 Agent 组合成完整系统&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - 学习 LangGraph、AutoGen、CrewAI 等成熟框架&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - 为 Agent 添加人工审核节点（Human-in-the-loop）&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">当前使用模型：</span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+第 5 章 Agent 系统 - 学习路径总结
+============================================================
+  01_react.ipynb  ReAct 模式: Thought→Action→Observation 循环
+  02_memory.ipynb  Agent 记忆: 滑动窗口/摘要/实体/向量记忆
+  03_multi_agent.ipynb  多 Agent 系统: Orchestrator/Pipeline/投票/消息总线
+
+下一步建议：
+  - 尝试将 ReAct + 记忆 + 多 Agent 组合成完整系统
+  - 学习 LangGraph、AutoGen、CrewAI 等成熟框架
+  - 为 Agent 添加人工审核节点（Human-in-the-loop）
+
+当前使用模型：openai/gpt-5-mini
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/05_agents"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02_memory.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Agent 记忆系统</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../06_finetuning/01_when_to_finetune.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">第六章：微调 — 01 什么时候需要微调？</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">为什么需要多 Agent？</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">常见的多 Agent 模式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-orchestrator-worker">Section 1：Orchestrator-Worker 模式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2-worker">Section 2：并行 Worker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3-pipeline">Section 3：Pipeline（流水线）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4-agent">Section 4：投票表决（多 Agent 共识）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5-agent">Section 5：Agent 间通信协议</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">进阶：完整多 Agent 项目演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">练习题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">总结：何时使用哪种模式？</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">四种模式对比</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">选择建议</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">生产建议</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

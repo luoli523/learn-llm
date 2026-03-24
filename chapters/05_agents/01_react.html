@@ -1,0 +1,1655 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ReAct 模式：推理 + 行动 &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/05_agents/01_react';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Agent 记忆系统" href="02_memory.html" />
+    <link rel="prev" title="完整 RAG 系统：端到端实战" href="../04_rag/04_end_to_end.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/05_agents/01_react.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/05_agents/01_react.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>ReAct 模式：推理 + 行动</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">什么是 ReAct？</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">核心循环</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">优势</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-react">Section 1：ReAct 提示格式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2-react">Section 2：手动 ReAct 循环</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3-function-calling-react">Section 3：用 Function Calling 实现 ReAct</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：实际任务演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：错误恢复</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">进阶：ReAct 步骤追踪可视化</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">练习题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">总结</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">ReAct 让模型具备了「先想后做」的能力</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">两种实现方式对比</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">最佳实践</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="react">
+<h1>ReAct 模式：推理 + 行动<a class="headerlink" href="#react" title="Link to this heading">#</a></h1>
+<section id="id1">
+<h2>什么是 ReAct？<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p><strong>ReAct = Reasoning + Acting</strong></p>
+<p>ReAct 是一种让大模型交替进行「思考」和「行动」的框架。每次行动后，模型会观察结果，再决定下一步。这是构建智能 Agent 的主流方式。</p>
+<section id="id2">
+<h3>核心循环<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>思考（Thought） → 行动（Action） → 观察（Observation） → 思考 → ...
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>优势<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>可解释性</strong>：每一步都有明确的思考过程</p></li>
+<li><p><strong>灵活性</strong>：可以根据观察结果动态调整策略</p></li>
+<li><p><strong>鲁棒性</strong>：遇到错误可以换一种方式重试</p></li>
+</ul>
+<p>本章将从手动文本解析版本，逐步过渡到使用 Function Calling 的现代实现。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">drop_params</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;使用模型：</span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># gpt-5/o系列不支持自定义temperature值，统一用安全wrapper</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_c</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">_m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openai/gpt-5&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o1&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o3&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o4&#39;</span><span class="p">)):</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>使用模型：openai/gpt-5-mini
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="section-1-react">
+<h2>Section 1：ReAct 提示格式<a class="headerlink" href="#section-1-react" title="Link to this heading">#</a></h2>
+<p>经典 ReAct 格式要求模型以固定的文本结构输出，方便程序解析。</p>
+<p>格式规范：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Thought:</span></code>  模型的推理过程</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Action:</span></code>   要调用的工具名称</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Action</span> <span class="pre">Input:</span></code> 工具的输入参数</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Observation:</span></code> （程序填入）工具返回结果</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Final</span> <span class="pre">Answer:</span></code> 最终回答用户的内容</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── 工具定义 ──────────────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;模拟搜索引擎（返回假数据用于演示）&quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;北京天气&quot;</span><span class="p">:</span> <span class="s2">&quot;北京今日晴，气温 18°C，风力 3 级，适合户外活动&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;上海天气&quot;</span><span class="p">:</span> <span class="s2">&quot;上海今日多云，气温 22°C，风力 2 级，湿度较高&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;量子计算&quot;</span><span class="p">:</span> <span class="s2">&quot;量子计算利用量子力学原理进行计算，比传统计算机更快&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;未找到关于 &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39; 的相关信息&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;安全计算数学表达式&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 只允许数字和基本运算符</span>
+        <span class="n">allowed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s2">&quot;0123456789+-*/()., &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">allowed</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;错误：表达式包含非法字符&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>  <span class="c1"># noqa: S307  # 生产中请用更安全的方式</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;计算错误：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_date</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;返回今天的日期&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">())</span>
+
+
+<span class="n">TOOLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="n">search</span><span class="p">,</span>
+    <span class="s2">&quot;calculate&quot;</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
+    <span class="s2">&quot;get_date&quot;</span><span class="p">:</span> <span class="n">get_date</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ── ReAct 系统提示 ────────────────────────────────────────</span>
+
+<span class="n">REACT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;你是一个智能助手，通过「思考-行动-观察」循环来解决问题。</span>
+
+<span class="s2">你可以使用以下工具：</span>
+<span class="s2">- search(query)：搜索信息，query 是搜索关键词</span>
+<span class="s2">- calculate(expr)：计算数学表达式，expr 是数学表达式字符串</span>
+<span class="s2">- get_date()：获取今天的日期，无需参数</span>
+
+<span class="s2">每次输出必须严格遵循以下格式之一：</span>
+
+<span class="s2">格式 A（需要使用工具时）：</span>
+<span class="s2">Thought: 你的推理过程</span>
+<span class="s2">Action: 工具名称</span>
+<span class="s2">Action Input: 工具输入参数</span>
+
+<span class="s2">格式 B（已有足够信息时）：</span>
+<span class="s2">Thought: 你的推理过程</span>
+<span class="s2">Final Answer: 你的最终回答</span>
+
+<span class="s2">重要规则：</span>
+<span class="s2">1. 每次只输出一个 Action 或 Final Answer</span>
+<span class="s2">2. 等待 Observation 后再继续</span>
+<span class="s2">3. 不要编造工具返回的结果</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;工具已定义：&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">TOOLS</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;系统提示已准备好&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>工具已定义： [&#39;search&#39;, &#39;calculate&#39;, &#39;get_date&#39;]
+系统提示已准备好
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2-react">
+<h2>Section 2：手动 ReAct 循环<a class="headerlink" href="#section-2-react" title="Link to this heading">#</a></h2>
+<p>通过文本解析来驱动 ReAct 循环，是最直观的实现方式。</p>
+<p>核心逻辑：</p>
+<ol class="arabic simple">
+<li><p>将任务发给模型</p></li>
+<li><p>解析模型输出中的 <code class="docutils literal notranslate"><span class="pre">Action</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Action</span> <span class="pre">Input</span></code></p></li>
+<li><p>调用对应工具，得到 <code class="docutils literal notranslate"><span class="pre">Observation</span></code></p></li>
+<li><p>将 Observation 追加到对话历史，继续循环</p></li>
+<li><p>直到出现 <code class="docutils literal notranslate"><span class="pre">Final</span> <span class="pre">Answer:</span></code> 停止</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">parse_action</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    从模型输出中解析 Action 和 Action Input。</span>
+<span class="sd">    返回 (action_name, action_input) 或 None。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">action_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Action:\s*(.+)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">input_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Action Input:\s*(.+)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">action_match</span> <span class="ow">and</span> <span class="n">input_match</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">action_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">input_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_final_answer</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从模型输出中解析 Final Answer&quot;&quot;&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Final Answer:\s*(.+)&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">execute_tool</span><span class="p">(</span><span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tool_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;执行工具并返回结果&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tool_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;错误：工具 &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; 不存在。可用工具：</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tool_fn</span> <span class="o">=</span> <span class="n">tools</span><span class="p">[</span><span class="n">tool_name</span><span class="p">]</span>
+        <span class="c1"># get_date 不需要参数</span>
+        <span class="k">if</span> <span class="n">tool_name</span> <span class="o">==</span> <span class="s2">&quot;get_date&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tool_fn</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tool_fn</span><span class="p">(</span><span class="n">tool_input</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;工具执行错误：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">react_agent</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    手动文本解析版 ReAct Agent。</span>
+
+<span class="sd">    参数：</span>
+<span class="sd">        task: 用户任务描述</span>
+<span class="sd">        tools: 工具字典 {name: function}</span>
+<span class="sd">        max_steps: 最大循环步数（防止无限循环）</span>
+
+<span class="sd">    返回：</span>
+<span class="sd">        最终回答字符串</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">REACT_SYSTEM_PROMPT</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;任务：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">── 步骤 </span><span class="si">{</span><span class="n">step</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> ──&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 调用模型</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">assistant_text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;模型输出：</span><span class="se">\n</span><span class="si">{</span><span class="n">assistant_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 追加助手消息</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">assistant_text</span><span class="p">})</span>
+
+        <span class="c1"># 检查是否已有最终答案</span>
+        <span class="n">final_answer</span> <span class="o">=</span> <span class="n">parse_final_answer</span><span class="p">(</span><span class="n">assistant_text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">final_answer</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最终答案：</span><span class="si">{</span><span class="n">final_answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">final_answer</span>
+
+        <span class="c1"># 解析并执行工具</span>
+        <span class="n">action_result</span> <span class="o">=</span> <span class="n">parse_action</span><span class="p">(</span><span class="n">assistant_text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action_result</span><span class="p">:</span>
+            <span class="n">action_name</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">action_result</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">执行工具：</span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">action_input</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="n">observation</span> <span class="o">=</span> <span class="n">execute_tool</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span> <span class="n">action_input</span><span class="p">,</span> <span class="n">tools</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;观察结果：</span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 将 Observation 作为用户消息追加</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Observation: </span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;无法解析 Action，终止循环&quot;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="s2">&quot;达到最大步数限制，未能得出最终答案&quot;</span>
+
+
+<span class="c1"># 简单测试</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">react_agent</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;今天是几号？&quot;</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+任务：今天是几号？
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+Thought: 需要调用获取当前日期的工具来回答“今天是几号？”
+Action: get_date
+Action Input: 无
+
+执行工具：get_date(无)
+观察结果：2026-03-14
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+Thought: 已有今天的日期信息，可以直接回答具体日期。
+Final Answer: 今天是2026年3月14日。
+
+============================================================
+最终答案：今天是2026年3月14日。
+============================================================
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-3-function-calling-react">
+<h2>Section 3：用 Function Calling 实现 ReAct<a class="headerlink" href="#section-3-function-calling-react" title="Link to this heading">#</a></h2>
+<p>文本解析方式脆弱，容易因格式不规范而失败。
+现代做法是使用 <strong>Function Calling（工具调用）</strong>，让模型返回结构化 JSON。</p>
+<p>优势对比：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>维度</p></th>
+<th class="head"><p>文本解析</p></th>
+<th class="head"><p>Function Calling</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>可靠性</p></td>
+<td><p>依赖格式规范</p></td>
+<td><p>结构化，稳定</p></td>
+</tr>
+<tr class="row-odd"><td><p>参数类型</p></td>
+<td><p>全是字符串</p></td>
+<td><p>支持数字、列表等</p></td>
+</tr>
+<tr class="row-even"><td><p>错误处理</p></td>
+<td><p>复杂</p></td>
+<td><p>简单</p></td>
+</tr>
+<tr class="row-odd"><td><p>模型支持</p></td>
+<td><p>所有模型</p></td>
+<td><p>需要支持 tool_calls</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ── Function Calling 工具描述（JSON Schema 格式）─────────────</span>
+
+<span class="n">FC_TOOLS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;search&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;搜索互联网上的信息&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;搜索关键词&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;calculate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;计算数学表达式&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;数学表达式，如 &#39;(18 + 22) / 2&#39;&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;expr&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;get_date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;获取今天的日期&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">react_agent_fc</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function Calling 版 ReAct Agent。</span>
+<span class="sd">    使用结构化工具调用代替文本解析。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;你是一个智能助手，通过调用工具来解决问题。先思考需要哪些信息，再调用合适的工具。&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;任务：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">── 步骤 </span><span class="si">{</span><span class="n">step</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> ──&quot;</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">FC_TOOLS</span><span class="p">,</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">finish_reason</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">finish_reason</span>
+
+        <span class="c1"># 追加助手消息（包含可能的 tool_calls）</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># 没有工具调用 → 直接返回文本答案</span>
+        <span class="k">if</span> <span class="n">finish_reason</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;（无文本回答）&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最终答案：</span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">answer</span>
+
+        <span class="c1"># 处理工具调用</span>
+        <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">fn_name</span> <span class="o">=</span> <span class="n">tool_call</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">fn_args</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tool_call</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;调用工具：</span><span class="si">{</span><span class="n">fn_name</span><span class="si">}</span><span class="s2">，参数：</span><span class="si">{</span><span class="n">fn_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 执行工具</span>
+            <span class="k">if</span> <span class="n">fn_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;错误：工具 &#39;</span><span class="si">{</span><span class="n">fn_name</span><span class="si">}</span><span class="s2">&#39; 不存在&quot;</span>
+            <span class="k">elif</span> <span class="n">fn_name</span> <span class="o">==</span> <span class="s2">&quot;get_date&quot;</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="n">tools</span><span class="p">[</span><span class="n">fn_name</span><span class="p">]()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="n">tools</span><span class="p">[</span><span class="n">fn_name</span><span class="p">](</span><span class="o">**</span><span class="n">fn_args</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;工具结果：</span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 将工具结果追加到消息历史</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tool_call_id&quot;</span><span class="p">:</span> <span class="n">tool_call</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">observation</span><span class="p">,</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="s2">&quot;达到最大步数限制&quot;</span>
+
+
+<span class="c1"># 测试 Function Calling 版本</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">react_agent_fc</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;计算 (123 + 456) * 2 的结果&quot;</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+任务：计算 (123 + 456) * 2 的结果
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：calculate，参数：{&#39;expr&#39;: &#39;(123 + 456) * 2&#39;}
+工具结果：1158
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最终答案：(123 + 456) = 579，579 × 2 = 1158。因此结果是 1158。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-4">
+<h2>Section 4：实际任务演示<a class="headerlink" href="#section-4" title="Link to this heading">#</a></h2>
+<p>任务：查询北京和上海的天气，计算平均温度，并告诉我哪个城市更适合今天跑步。</p>
+<p>这个任务需要：</p>
+<ol class="arabic simple">
+<li><p>搜索北京天气</p></li>
+<li><p>搜索上海天气</p></li>
+<li><p>计算平均温度</p></li>
+<li><p>综合判断给出推荐</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用 Function Calling 版本演示多步任务</span>
+<span class="n">weather_task</span> <span class="o">=</span> <span class="s2">&quot;查询北京和上海的天气，计算平均温度，并告诉我哪个城市更适合今天跑步&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">react_agent_fc</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">weather_task</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最终推荐：</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+任务：查询北京和上海的天气，计算平均温度，并告诉我哪个城市更适合今天跑步
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：search，参数：{&#39;query&#39;: &#39;北京 今日 天气 温度&#39;}
+工具结果：未找到关于 &#39;北京 今日 天气 温度&#39; 的相关信息
+调用工具：search，参数：{&#39;query&#39;: &#39;上海 今日 天气 温度&#39;}
+工具结果：未找到关于 &#39;上海 今日 天气 温度&#39; 的相关信息
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最终答案：我刚才搜索当前天气时没有找到结果。你想怎么继续？有几个选项（请选择一个）：
+
+1) 我再试一次网上查询（我会改用更宽泛的关键词如“北京 天气 现在/实时温度”并获取上海同样的信息）。  
+2) 你直接告诉我北京和上海现在的气温（摄氏度），我立即帮你计算平均温度并给出跑步建议。  
+3) 只按常规经验让我直接给出建议（例如理想跑步温度区间、考虑空气质量和降水等因素的通用建议）。
+
+另外请告诉我是否需要考虑空气质量、降雨/湿度或风速等因素，结果用摄氏度还是华氏度。你选哪个？
+
+最终推荐：我刚才搜索当前天气时没有找到结果。你想怎么继续？有几个选项（请选择一个）：
+
+1) 我再试一次网上查询（我会改用更宽泛的关键词如“北京 天气 现在/实时温度”并获取上海同样的信息）。  
+2) 你直接告诉我北京和上海现在的气温（摄氏度），我立即帮你计算平均温度并给出跑步建议。  
+3) 只按常规经验让我直接给出建议（例如理想跑步温度区间、考虑空气质量和降水等因素的通用建议）。
+
+另外请告诉我是否需要考虑空气质量、降雨/湿度或风速等因素，结果用摄氏度还是华氏度。你选哪个？
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 同一任务，用手动解析版本对比</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">对比：使用手动文本解析版本</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">result2</span> <span class="o">=</span> <span class="n">react_agent</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">weather_task</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>对比：使用手动文本解析版本
+
+
+============================================================
+任务：查询北京和上海的天气，计算平均温度，并告诉我哪个城市更适合今天跑步
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+Thought: 我需要先获取北京今天的天气信息，然后再获取上海的天气，最后计算平均温度并给出跑步建议。先查询北京今天天气。
+Action: search
+Action Input: 北京 今天天气
+
+执行工具：search(北京 今天天气)
+观察结果：未找到关于 &#39;北京 今天天气&#39; 的相关信息
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+Thought: 上次搜索未返回结果，我改用更具体的关键词重新查询北京今天天气（包含实时温度与空气质量）。  
+Action: search  
+Action Input: 北京 今天天气 实时 温度 空气质量
+
+执行工具：search(北京 今天天气 实时 温度 空气质量)
+观察结果：未找到关于 &#39;北京 今天天气 实时 温度 空气质量&#39; 的相关信息
+
+── 步骤 3 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+Thought: 改用不同词组和更通用的关键词再搜一次，尝试“北京市 今日 天气 实时 温度 空气质量”以获取所需信息。  
+Action: search  
+Action Input: 北京市 今日 天气 实时 温度 空气质量
+
+执行工具：search(北京市 今日 天气 实时 温度 空气质量)
+观察结果：未找到关于 &#39;北京市 今日 天气 实时 温度 空气质量&#39; 的相关信息
+
+── 步骤 4 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>模型输出：
+
+无法解析 Action，终止循环
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-5">
+<h2>Section 5：错误恢复<a class="headerlink" href="#section-5" title="Link to this heading">#</a></h2>
+<p>Agent 遇到工具错误时，应该能够：</p>
+<ol class="arabic simple">
+<li><p>识别错误信息</p></li>
+<li><p>调整策略（换一个工具，或换一种输入）</p></li>
+<li><p>继续完成任务</p></li>
+</ol>
+<p>我们通过添加一个「有时会失败」的工具来演示错误恢复。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+<span class="c1"># 一个不稳定的工具（50% 概率失败）</span>
+<span class="n">_unstable_call_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unstable_search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;模拟不稳定的搜索服务&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_unstable_call_count</span>
+    <span class="n">_unstable_call_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># 第一次调用必定失败，后续正常</span>
+    <span class="k">if</span> <span class="n">_unstable_call_count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;错误：搜索服务暂时不可用，请稍后重试或使用其他关键词&quot;</span>
+    <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_stock_price</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;获取股票价格（演示用）&quot;&quot;&quot;</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;AAPL&quot;</span><span class="p">:</span> <span class="s2">&quot;185.20&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GOOG&quot;</span><span class="p">:</span> <span class="s2">&quot;141.80&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BTC&quot;</span><span class="p">:</span> <span class="s2">&quot;67500&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">prices</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> 当前价格：$</span><span class="si">{</span><span class="n">prices</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;错误：找不到股票代码 &#39;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&#39;，请检查代码是否正确&quot;</span>
+
+
+<span class="n">RESILIENT_FC_TOOLS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable_search&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;搜索信息（有时可能失败，失败时需要重试或换关键词）&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;搜索关键词&quot;</span><span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;get_stock_price&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;获取股票或加密货币价格，symbol 为股票代码如 AAPL、GOOG、BTC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;股票代码&quot;</span><span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;symbol&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;calculate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;计算数学表达式&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;expr&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">RESILIENT_TOOLS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;unstable_search&quot;</span><span class="p">:</span> <span class="n">unstable_search</span><span class="p">,</span>
+    <span class="s2">&quot;get_stock_price&quot;</span><span class="p">:</span> <span class="n">get_stock_price</span><span class="p">,</span>
+    <span class="s2">&quot;calculate&quot;</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">react_agent_resilient</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;具备错误恢复能力的 ReAct Agent&quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;你是一个智能助手。当工具调用失败时，不要放弃，&quot;</span>
+                <span class="s2">&quot;尝试换一种方式（如换关键词重试、使用备选工具）。&quot;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;任务（错误恢复测试）：</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">── 步骤 </span><span class="si">{</span><span class="n">step</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> ──&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">RESILIENT_FC_TOOLS</span><span class="p">,</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;（无回答）&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最终答案：</span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">answer</span>
+
+        <span class="k">for</span> <span class="n">tc</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">fn_name</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">fn_args</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tc</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;调用工具：</span><span class="si">{</span><span class="n">fn_name</span><span class="si">}</span><span class="s2">，参数：</span><span class="si">{</span><span class="n">fn_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">tool_fn</span> <span class="o">=</span> <span class="n">RESILIENT_TOOLS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fn_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tool_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;错误：工具 &#39;</span><span class="si">{</span><span class="n">fn_name</span><span class="si">}</span><span class="s2">&#39; 不存在&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="n">tool_fn</span><span class="p">(</span><span class="o">**</span><span class="n">fn_args</span><span class="p">)</span>
+
+            <span class="c1"># 标记错误消息，引导模型注意</span>
+            <span class="k">if</span> <span class="s2">&quot;错误&quot;</span> <span class="ow">in</span> <span class="n">observation</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;工具报错：</span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;工具结果：</span><span class="si">{</span><span class="n">observation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tool_call_id&quot;</span><span class="p">:</span> <span class="n">tc</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">observation</span><span class="p">,</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="s2">&quot;达到最大步数限制&quot;</span>
+
+
+<span class="c1"># 重置计数器，测试错误恢复</span>
+<span class="n">_unstable_call_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">react_agent_resilient</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;查询北京天气，并告诉我今天是否适合骑行&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+任务（错误恢复测试）：查询北京天气，并告诉我今天是否适合骑行
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：unstable_search，参数：{&#39;query&#39;: &#39;北京 今天天气 实时 温度 降雨 风速 空气质量 AQI&#39;}
+工具报错：错误：搜索服务暂时不可用，请稍后重试或使用其他关键词
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：unstable_search，参数：{&#39;query&#39;: &#39;北京市 今天天气 预报 逐小时 风速 降雨 概率 空气质量 AQI&#39;}
+工具结果：未找到关于 &#39;北京市 今天天气 预报 逐小时 风速 降雨 概率 空气质量 AQI&#39; 的相关信息
+
+── 步骤 3 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最终答案：我刚尝试获取实时天气但搜索服务暂时不可用，暂时无法直接拉取北京的实时数据。可以这样继续，你选一个告诉我就行：
+
+- 我现在重试一次在线查询（我会换关键词或再试几次）。  
+- 或者你把手机/网页上看到的当前温度、降雨情况、风速/风力、AQI（空气质量）给我，我来判断是否适合骑行。  
+- 或者你想要我给出一份「如何自己快速判断是否适合骑行」的清单和决策规则（我下面先把清单发给你，直接可用）。
+
+先把判断要点和决策规则给你（可直接按此自查）：
+
+1. 是否下雨/路面情况
+- 不下雨且路面干燥：适合。  
+- 毛毛雨/细雨（小雨）且有挡泥/护具：勉强可行，注意防滑、减速。  
+- 中到大雨、路面积水或有雨夹雪/结冰：不建议骑行。
+
+2. 风力
+- 风速 &lt; 6–8 m/s（约 20–30 km/h）：一般可安全骑行。  
+- 风速 8–12 m/s（30–43 km/h）：会影响稳定性，遇阵风要谨慎、选择避风路线或改乘。  
+- 风速 &gt; 12–15 m/s（&gt;43–54 km/h）或有强阵风：不安全，建议不骑。
+
+3. 温度
+- 舒适：约 10–28°C（根据个人耐寒/耐热略有差异）。  
+- 冷：&lt; 5°C 要穿暖、注意路面结冰，低于 -5°C 严重影响安全与制动。  
+- 热：&gt; 35°C 不建议进行长时间或高强度骑行，注意补水与避暑。
+
+4. 空气质量（AQI）
+- 0–50（优）：安全。  
+- 51–100（良）：多数人可骑，敏感人群注意短时逗留。  
+- 101–150（轻度污染，对敏感人群不利）：建议短途且强度低；敏感者避免。  
+- &gt;150（中度或以上污染）：不建议骑行（尤其是长时间或高速骑行）。
+
+5. 能见度/其他
+- 大雾、能见度低、路灯不足、施工路段或路况差时不建议骑行或选择短程路线并开灯/穿反光衣。
+
+6. 装备和安全建议（无论天气都应遵守）
+- 佩戴头盔、灯、反光衣/条；下雨带挡泥板或穿防水外套；备水、手机、充电宝；选择有自行车道或车流少路线；遇到大风/暴雨/空气污染可改乘地铁/公交/网约车。
+
+简单决策规则（把上面条件综合）：
+- 如果（无降雨）且（风速 &lt; 8 m/s）且（AQI ≤ 100）且（温度适中），则“适合骑行（正常骑行）”。  
+- 如果只有一项轻微不利（小雨、风速接近阈值或AQI 100-150），则“可骑但需注意并缩短/放慢行程或选避风路线”。  
+- 如果有一项严重不利（大雨、风 &gt;12 m/s、AQI &gt;150、能见度差或路面结冰），则“不建议骑行”。
+
+如何快速查到这些信息（你可以在手机上或电脑上照做）：
+- 搜索关键词：“北京 天气 实况” / “Beijing weather” 或 打开天气类APP（墨迹天气、彩云天气、和风天气、天气通、苹果/安卓系统自带天气）。  
+- 查风速/风向：在逐小时预报里看“风速/风向”或“风力等级（几级）”。  
+- 查降雨概率/分钟级雷达：看“未来1小时降雨/雷达回波”。  
+- 查AQI：搜索“北京 AQI”或打开 aqicn.org（世界空气质量项目）、中国环境监测总站或本地空气质量APP。
+- 若你愿意，把你看到的“当前温度 / 降雨（有/无或降雨量） / 风速（m/s 或 km/h 或几级） / AQI”发给我，我马上判断并给出建议和替代路线建议。
+
+要我现在重试在线查询吗？还是你贴一下当前数据？
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2>进阶：ReAct 步骤追踪可视化<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>为了更好地理解 Agent 的执行路径，我们可以记录每一步的详细信息。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">react_agent_traced</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fc_tools</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    带完整追踪记录的 ReAct Agent。</span>
+<span class="sd">    返回 (最终答案, 追踪记录列表)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;你是一个智能助手，通过调用工具来解决复杂问题。&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">},</span>
+    <span class="p">]</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 记录每一步</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">fc_tools</span><span class="p">,</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">step_record</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;thought&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">step_record</span><span class="p">[</span><span class="s2">&quot;final_answer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span>
+            <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_record</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">trace</span>
+
+        <span class="k">for</span> <span class="n">tc</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+            <span class="n">fn_name</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">fn_args</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tc</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">fn_name</span> <span class="o">==</span> <span class="s2">&quot;get_date&quot;</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="n">tools</span><span class="p">[</span><span class="n">fn_name</span><span class="p">]()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="n">tools</span><span class="p">[</span><span class="n">fn_name</span><span class="p">](</span><span class="o">**</span><span class="n">fn_args</span><span class="p">)</span>
+
+            <span class="n">step_record</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">fn_name</span><span class="p">,</span>
+                <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">fn_args</span><span class="p">,</span>
+                <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">observation</span><span class="p">,</span>
+            <span class="p">})</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tool_call_id&quot;</span><span class="p">:</span> <span class="n">tc</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">observation</span><span class="p">,</span>
+            <span class="p">})</span>
+
+        <span class="n">trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_record</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot;达到步数限制&quot;</span><span class="p">,</span> <span class="n">trace</span>
+
+
+<span class="c1"># 运行并打印可视化追踪</span>
+<span class="n">answer</span><span class="p">,</span> <span class="n">trace</span> <span class="o">=</span> <span class="n">react_agent_traced</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;今天几号？(18 + 22) / 2 等于多少？&quot;</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+    <span class="n">fc_tools</span><span class="o">=</span><span class="n">FC_TOOLS</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;执行追踪记录&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">trace</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[步骤 </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;thought&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  思考：</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;thought&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;actions&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  行动：</span><span class="si">{</span><span class="n">action</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">action</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  结果：</span><span class="si">{</span><span class="n">action</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;final_answer&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ✓ 最终答案：</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;final_answer&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+执行追踪记录
+============================================================
+
+[步骤 1]
+  行动：get_date({})
+  结果：2026-03-14
+  行动：calculate({&#39;expr&#39;: &#39;(18 + 22) / 2&#39;})
+  结果：20.0
+
+[步骤 2]
+  思考：今天是 2026年3月14日。(18 + 22) / 2 = 20。需要我帮你算其他题吗？
+  ✓ 最终答案：今天是 2026年3月14日。(18 + 22) / 2 = 20。需要我帮你算其他题吗？
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2>练习题<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>扩展工具集</strong>：添加一个 <code class="docutils literal notranslate"><span class="pre">get_weather(city)</span></code> 工具，返回真实天气数据（可以用 OpenWeatherMap API）。</p></li>
+<li><p><strong>自定义最大步数</strong>：当任务特别复杂时，<code class="docutils literal notranslate"><span class="pre">max_steps=5</span></code> 可能不够。试着运行一个需要 8 步的任务，观察会发生什么。</p></li>
+<li><p><strong>并行工具调用</strong>：部分模型支持在一次响应中调用多个工具（<code class="docutils literal notranslate"><span class="pre">parallel_tool_calls</span></code>）。修改 <code class="docutils literal notranslate"><span class="pre">react_agent_fc</span></code> 以支持并行调用，并测试查询两个城市天气的任务是否变快。</p></li>
+<li><p><strong>自定义停止条件</strong>：除了 <code class="docutils literal notranslate"><span class="pre">Final</span> <span class="pre">Answer</span></code>，添加一个「置信度检查」：如果模型输出包含「我不确定」，自动重新搜索。</p></li>
+</ol>
+</section>
+<section id="id6">
+<h2>总结<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<section id="id7">
+<h3>ReAct 让模型具备了「先想后做」的能力<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>核心概念</p></th>
+<th class="head"><p>说明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Thought</strong></p></td>
+<td><p>模型的推理过程，可见、可调试</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Action</strong></p></td>
+<td><p>调用外部工具（搜索、计算、API 等）</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Observation</strong></p></td>
+<td><p>工具返回的真实结果</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>循环</strong></p></td>
+<td><p>不断迭代直到得出最终答案</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id8">
+<h3>两种实现方式对比<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>方式</p></th>
+<th class="head"><p>优点</p></th>
+<th class="head"><p>缺点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>文本解析</p></td>
+<td><p>兼容所有模型</p></td>
+<td><p>格式脆弱，易出错</p></td>
+</tr>
+<tr class="row-odd"><td><p>Function Calling</p></td>
+<td><p>结构化、稳定、支持复杂参数</p></td>
+<td><p>需要模型支持</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id9">
+<h3>最佳实践<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>始终设置 <code class="docutils literal notranslate"><span class="pre">max_steps</span></code> 防止无限循环</p></li>
+<li><p>工具函数要有清晰的错误返回（让模型知道失败原因）</p></li>
+<li><p>系统提示中明确工具的使用边界</p></li>
+<li><p>记录执行追踪，便于调试</p></li>
+</ul>
+<p>下一章我们将学习如何为 Agent 添加记忆能力，处理长期任务。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 知识检验：完整演示</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ReAct Agent 完整能力演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;模型：</span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;可用工具：</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">TOOLS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># 综合任务</span>
+<span class="n">final_result</span> <span class="o">=</span> <span class="n">react_agent_fc</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;先告诉我今天日期，然后查一下北京天气，&quot;</span>
+        <span class="s2">&quot;再计算 18 摄氏度转华氏温度（公式：F = C * 9/5 + 32）&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">TOOLS</span><span class="p">,</span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">任务完成！&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ReAct Agent 完整能力演示
+============================================================
+模型：openai/gpt-5-mini
+可用工具：[&#39;search&#39;, &#39;calculate&#39;, &#39;get_date&#39;]
+
+
+============================================================
+任务：先告诉我今天日期，然后查一下北京天气，再计算 18 摄氏度转华氏温度（公式：F = C * 9/5 + 32）
+============================================================
+
+── 步骤 1 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：get_date，参数：{}
+工具结果：2026-03-14
+调用工具：search，参数：{&#39;query&#39;: &#39;北京 天气&#39;}
+工具结果：未找到关于 &#39;北京 天气&#39; 的相关信息
+调用工具：calculate，参数：{&#39;expr&#39;: &#39;18 * 9/5 + 32&#39;}
+工具结果：64.4
+
+── 步骤 2 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>调用工具：search，参数：{&#39;query&#39;: &#39;北京 今天 天气 现在&#39;}
+工具结果：未找到关于 &#39;北京 今天 天气 现在&#39; 的相关信息
+
+── 步骤 3 ──
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最终答案：今天是 2026-03-14。
+
+关于北京的即时天气：我刚尝试检索当前的天气信息，但未能获取到实时天气数据。要么是检索受限，要么暂时无法访问天气源。你想让我再试一次吗？或者你可以告诉我你希望查的具体区/街道，我再精确检索。
+
+如果你需要一个大致参考：3月的北京通常是春季过渡期，日间气温常在约 5–15°C 之间，早晚偏凉，空气相对干燥并可能有风，有时会下小雨或沙尘（仅作典型季节性参考，非实时预报）。
+
+温度换算：
+F = C * 9/5 + 32
+代入 C = 18：
+F = 18 * 9/5 + 32 = 64.4°F
+
+要不要我再尝试获取实时天气，或为你查具体时段的预报（今天/24小时/7天）？
+
+任务完成！
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/05_agents"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../04_rag/04_end_to_end.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">完整 RAG 系统：端到端实战</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_memory.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Agent 记忆系统</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">什么是 ReAct？</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">核心循环</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">优势</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-react">Section 1：ReAct 提示格式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2-react">Section 2：手动 ReAct 循环</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3-function-calling-react">Section 3：用 Function Calling 实现 ReAct</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：实际任务演示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：错误恢复</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">进阶：ReAct 步骤追踪可视化</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">练习题</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">总结</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">ReAct 让模型具备了「先想后做」的能力</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">两种实现方式对比</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">最佳实践</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

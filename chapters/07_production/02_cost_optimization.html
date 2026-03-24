@@ -1,0 +1,1713 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>第七章：生产环境 — 02 成本优化 &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/07_production/02_cost_optimization';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="第七章：生产环境 — 03 可观测性与监控" href="03_observability.html" />
+    <link rel="prev" title="第七章：生产环境 — 01 LLM 评估" href="01_evaluation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/07_production/02_cost_optimization.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/07_production/02_cost_optimization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>第七章：生产环境 — 02 成本优化</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">成本优化全景图</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-token">Section 1：Token 成本核算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2">Section 2：提示词压缩</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3">Section 3：语义缓存</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：模型路由</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：批量处理</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-6">Section 6：输出长度控制</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-7">Section 7：极端成本场景优化</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="id1">
+<h1>第七章：生产环境 — 02 成本优化<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>LLM API 成本可以优化 <strong>10x 以上</strong>。本章覆盖所有主要的降本手段。</p>
+<section id="id2">
+<h2>成本优化全景图<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>LLM 成本 = 请求数量 × 每次 token 数 × 单价
+
+降本策略：
+1. 降低单价     → 选择更便宜的模型、批量折扣
+2. 减少 token   → 压缩提示词、控制输出长度
+3. 减少请求数   → 语义缓存、结果复用
+4. 智能路由     → 简单任务用小模型
+5. 并行处理     → 减少等待时间（间接降本）
+</pre></div>
+</div>
+<p><strong>本章目标：</strong> 掌握每种策略的实现方式和预期节省比例。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">drop_params</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tiktoken</span>
+    <span class="n">TIKTOKEN_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">TIKTOKEN_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tiktoken 未安装，将用字符数估算 token：pip install tiktoken&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="n">NUMPY_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">NUMPY_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy 未安装：pip install numpy&quot;</span><span class="p">)</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LLM_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="n">litellm</span><span class="o">.</span><span class="n">set_verbose</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;使用模型: </span><span class="si">{</span><span class="n">MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;成本优化工具包初始化完成&quot;</span><span class="p">)</span>
+<span class="c1"># gpt-5/o系列不支持自定义temperature值，统一用安全wrapper</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_c</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">_m</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">_m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openai/gpt-5&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o1&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o3&#39;</span><span class="p">,</span><span class="s1">&#39;openai/o4&#39;</span><span class="p">)):</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>使用模型: openai/gpt-5-mini
+成本优化工具包初始化完成
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1-token">
+<h2>Section 1：Token 成本核算<a class="headerlink" href="#section-1-token" title="Link to this heading">#</a></h2>
+<p>首先要知道自己花了多少钱，才能针对性地优化。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 各模型价格表（2024年，USD/1M tokens）</span>
+<span class="n">MODEL_PRICES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;gpt-4o&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">2.50</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">10.00</span><span class="p">},</span>
+    <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">0.60</span><span class="p">},</span>
+    <span class="s2">&quot;claude-3-5-sonnet&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">3.00</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">15.00</span><span class="p">},</span>
+    <span class="s2">&quot;claude-3-haiku&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">},</span>
+    <span class="s2">&quot;gemini-1.5-flash&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">0.075</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">0.30</span><span class="p">},</span>
+    <span class="s2">&quot;gemini-1.5-pro&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">},</span>
+    <span class="s2">&quot;llama-3-8b-self-hosted&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;server&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>  <span class="c1"># GPU $2/hr</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cost_estimate</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">completion_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    估算 LLM API 调用成本</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        model: 模型名称</span>
+<span class="sd">        prompt_tokens: 输入 token 数</span>
+<span class="sd">        completion_tokens: 输出 token 数</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict with cost breakdown in USD</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MODEL_PRICES</span><span class="p">:</span>
+        <span class="c1"># 尝试从 litellm 获取</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cost</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">completion_cost</span><span class="p">(</span>
+                <span class="n">completion_response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">prompt_tokens</span><span class="p">,</span>
+                <span class="n">completion</span><span class="o">=</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">completion_tokens</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;total_usd&quot;</span><span class="p">:</span> <span class="n">cost</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;litellm&quot;</span><span class="p">}</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;未知模型: </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    
+    <span class="n">prices</span> <span class="o">=</span> <span class="n">MODEL_PRICES</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
+    <span class="n">input_cost</span> <span class="o">=</span> <span class="n">prompt_tokens</span> <span class="o">/</span> <span class="mi">1_000_000</span> <span class="o">*</span> <span class="n">prices</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span>
+    <span class="n">output_cost</span> <span class="o">=</span> <span class="n">completion_tokens</span> <span class="o">/</span> <span class="mi">1_000_000</span> <span class="o">*</span> <span class="n">prices</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">input_cost</span> <span class="o">+</span> <span class="n">output_cost</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+        <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="n">prompt_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;completion_tokens&quot;</span><span class="p">:</span> <span class="n">completion_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;input_cost_usd&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">input_cost</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="s2">&quot;output_cost_usd&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">output_cost</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="s2">&quot;total_usd&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;manual&quot;</span>
+    <span class="p">}</span>
+
+
+<span class="c1"># 场景：1M 请求/天，每次 300 prompt + 200 completion tokens</span>
+<span class="n">DAILY_REQUESTS</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+<span class="n">PROMPT_TOKENS</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">COMPLETION_TOKENS</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;场景：每天 </span><span class="si">{</span><span class="n">DAILY_REQUESTS</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> 次请求，每次 </span><span class="si">{</span><span class="n">PROMPT_TOKENS</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">COMPLETION_TOKENS</span><span class="si">}</span><span class="s2"> tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;模型&#39;</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;单次成本&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;每日成本&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;每月成本&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+
+<span class="n">costs_data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">MODEL_PRICES</span><span class="p">:</span>
+    <span class="n">single</span> <span class="o">=</span> <span class="n">cost_estimate</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">PROMPT_TOKENS</span><span class="p">,</span> <span class="n">COMPLETION_TOKENS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">single</span><span class="p">:</span>
+        <span class="k">continue</span>
+    
+    <span class="n">per_call</span> <span class="o">=</span> <span class="n">single</span><span class="p">[</span><span class="s2">&quot;total_usd&quot;</span><span class="p">]</span>
+    
+    <span class="c1"># 自托管：按服务器成本计算</span>
+    <span class="k">if</span> <span class="s2">&quot;server&quot;</span> <span class="ow">in</span> <span class="n">MODEL_PRICES</span><span class="p">[</span><span class="n">model_name</span><span class="p">]:</span>
+        <span class="n">server_hourly</span> <span class="o">=</span> <span class="n">MODEL_PRICES</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="s2">&quot;server&quot;</span><span class="p">]</span>
+        <span class="n">daily</span> <span class="o">=</span> <span class="n">server_hourly</span> <span class="o">*</span> <span class="mi">24</span>  <span class="c1"># $48/天</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">daily</span> <span class="o">=</span> <span class="n">per_call</span> <span class="o">*</span> <span class="n">DAILY_REQUESTS</span>
+    
+    <span class="n">monthly</span> <span class="o">=</span> <span class="n">daily</span> <span class="o">*</span> <span class="mi">30</span>
+    <span class="n">costs_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">&quot;per_call&quot;</span><span class="p">:</span> <span class="n">per_call</span><span class="p">,</span> <span class="s2">&quot;daily&quot;</span><span class="p">:</span> <span class="n">daily</span><span class="p">,</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span> <span class="n">monthly</span><span class="p">})</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_name</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">per_call</span><span class="si">:</span><span class="s2">&gt;10.6f</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">daily</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">monthly</span><span class="si">:</span><span class="s2">&gt;10,.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+<span class="n">cheapest</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">costs_data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">])</span>
+<span class="n">most_expensive</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">costs_data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">])</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">most_expensive</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">cheapest</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最贵: </span><span class="si">{</span><span class="n">most_expensive</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ($</span><span class="si">{</span><span class="n">most_expensive</span><span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">/天)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;最便宜: </span><span class="si">{</span><span class="n">cheapest</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ($</span><span class="si">{</span><span class="n">cheapest</span><span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">/天)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;价差: </span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>场景：每天 1,000,000 次请求，每次 300+200 tokens
+===========================================================================
+模型                                     单次成本         每日成本         每月成本
+---------------------------------------------------------------------------
+gpt-4o                         $  0.002750 $  2,750.00 $    82,500
+gpt-4o-mini                    $  0.000165 $    165.00 $     4,950
+claude-3-5-sonnet              $  0.003900 $  3,900.00 $   117,000
+claude-3-haiku                 $  0.000325 $    325.00 $     9,750
+gemini-1.5-flash               $  0.000082 $     82.00 $     2,460
+gemini-1.5-pro                 $  0.001375 $  1,375.00 $    41,250
+llama-3-8b-self-hosted         $  0.000000 $     48.00 $     1,440
+---------------------------------------------------------------------------
+
+最贵: claude-3-5-sonnet ($3900.00/天)
+最便宜: llama-3-8b-self-hosted ($48.00/天)
+价差: 81x
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 可视化：成本对比柱状图</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arial Unicode MS&#39;</span><span class="p">,</span> <span class="s1">&#39;DejaVu Sans&#39;</span><span class="p">]</span>
+    
+    <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-self-hosted&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">(自托管&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">costs_data</span><span class="p">]</span>
+    <span class="n">daily_costs</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">costs_data</span><span class="p">]</span>
+    
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#e74c3c&quot;</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">1000</span> <span class="k">else</span> <span class="p">(</span><span class="s2">&quot;#f39c12&quot;</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="s2">&quot;#2ecc71&quot;</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">daily_costs</span><span class="p">]</span>
+    
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)),</span> <span class="n">daily_costs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;每日成本 (USD)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM 每日成本对比（</span><span class="si">{</span><span class="n">DAILY_REQUESTS</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> 请求/天，</span><span class="si">{</span><span class="n">PROMPT_TOKENS</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">COMPLETION_TOKENS</span><span class="si">}</span><span class="s2"> tokens/次）&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">daily_costs</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">cost</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$100/天 预算线&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;/tmp/llm_cost_comparison.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;图表已保存到 /tmp/llm_cost_comparison.png&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;matplotlib 未安装，跳过可视化&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;安装：pip install matplotlib&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">成本数据（每日，USD）：&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">costs_data</span><span class="p">:</span>
+        <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;█&quot;</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;daily&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8,.0f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">bar</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/cd4d0820fa09957d14f5e1f919efda35ee2c413fbf65ccc22600d6eef27bd500.png" src="../../_images/cd4d0820fa09957d14f5e1f919efda35ee2c413fbf65ccc22600d6eef27bd500.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>图表已保存到 /tmp/llm_cost_comparison.png
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2">
+<h2>Section 2：提示词压缩<a class="headerlink" href="#section-2" title="Link to this heading">#</a></h2>
+<p>减少输入 token 是降低成本最直接的方式。提示词压缩不改变语义，只减少冗余。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">count_tokens</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;估算 token 数量&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">TIKTOKEN_AVAILABLE</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">enc</span> <span class="o">=</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">encoding_for_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="c1"># fallback：中文约1.5字符/token，英文约4字符/token</span>
+    <span class="n">chinese_chars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fff]&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+    <span class="n">other_chars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="n">chinese_chars</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">chinese_chars</span> <span class="o">/</span> <span class="mf">1.5</span> <span class="o">+</span> <span class="n">other_chars</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compress_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    提示词压缩：去除冗余内容</span>
+<span class="sd">    </span>
+<span class="sd">    策略：</span>
+<span class="sd">    1. 去除多余空白和空行</span>
+<span class="sd">    2. 合并重复指令</span>
+<span class="sd">    3. 去除礼貌性冗余词</span>
+<span class="sd">    4. 压缩常见短语</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">original</span> <span class="o">=</span> <span class="n">text</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">text</span>
+    
+    <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1"># 1. 去除多余空白</span>
+    <span class="n">before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39; {2,}&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>      <span class="c1"># 多个空格→单个</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n{3,}&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>   <span class="c1"># 多个空行→两个</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\t&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>           <span class="c1"># Tab→空格</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">compressed</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">saved</span> <span class="o">=</span> <span class="n">before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">saved</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;去除多余空白：节省 </span><span class="si">{</span><span class="n">saved</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 2. 去除礼貌性冗余</span>
+    <span class="n">redundant_phrases</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;请你?帮(?:我|我们)?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;麻烦你?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;谢谢[你您]?[！!。]?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;好的，我明白了[。！]?\s*&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;非常感谢[！!。]?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;您好[！!，,]?\s*&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">redundant_phrases</span><span class="p">:</span>
+        <span class="n">compressed</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>
+    <span class="n">saved</span> <span class="o">=</span> <span class="n">before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">saved</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;去除礼貌词：节省 </span><span class="si">{</span><span class="n">saved</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># 3. 合并重复的指令</span>
+    <span class="c1"># 找到重复的句子</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[。！？\n]&#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">unique_sentences</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+        <span class="n">s_stripped</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">s_stripped</span> <span class="ow">and</span> <span class="n">s_stripped</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s_stripped</span><span class="p">)</span>
+            <span class="n">unique_sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s_stripped</span><span class="p">)</span>
+    <span class="n">deduped</span> <span class="o">=</span> <span class="s1">&#39;。&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unique_sentences</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">deduped</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">):</span>
+        <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;去重重复句子：节省 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">deduped</span><span class="p">)</span><span class="si">}</span><span class="s2"> 字符&quot;</span><span class="p">)</span>
+        <span class="n">compressed</span> <span class="o">=</span> <span class="n">deduped</span>
+    
+    <span class="c1"># 4. 最终清理</span>
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">compressed</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    
+    <span class="n">original_tokens</span> <span class="o">=</span> <span class="n">count_tokens</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+    <span class="n">compressed_tokens</span> <span class="o">=</span> <span class="n">count_tokens</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    <span class="n">reduction</span> <span class="o">=</span> <span class="p">(</span><span class="n">original_tokens</span> <span class="o">-</span> <span class="n">compressed_tokens</span><span class="p">)</span> <span class="o">/</span> <span class="n">original_tokens</span> <span class="k">if</span> <span class="n">original_tokens</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;original&quot;</span><span class="p">:</span> <span class="n">original</span><span class="p">,</span>
+        <span class="s2">&quot;compressed&quot;</span><span class="p">:</span> <span class="n">compressed</span><span class="p">,</span>
+        <span class="s2">&quot;original_chars&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">),</span>
+        <span class="s2">&quot;compressed_chars&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">compressed</span><span class="p">),</span>
+        <span class="s2">&quot;original_tokens&quot;</span><span class="p">:</span> <span class="n">original_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;compressed_tokens&quot;</span><span class="p">:</span> <span class="n">compressed_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;token_reduction&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;steps&quot;</span><span class="p">:</span> <span class="n">steps</span>
+    <span class="p">}</span>
+
+
+<span class="c1"># 演示</span>
+<span class="n">verbose_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;您好！麻烦请你帮我做一件事情，非常感谢。</span>
+
+<span class="s2">我想让你帮我分析一下这段文字的情感倾向。</span>
+<span class="s2">请你帮我判断这段文字的情感倾向。</span>
+<span class="s2">需要你分析情感倾向，包括正面、负面或者中性。</span>
+
+<span class="s2">文字内容如下所示：</span>
+
+<span class="s2">&quot;今天天气很好，心情愉快！&quot;</span>
+
+<span class="s2">请输出情感分析结果。谢谢！&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">compress_prompt</span><span class="p">(</span><span class="n">verbose_prompt</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;提示词压缩演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;原始提示词：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;original&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">压缩后提示词：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;compressed&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">压缩统计：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  字符数: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;original_chars&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;compressed_chars&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Token数: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;original_tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;compressed_tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Token节省: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;token_reduction&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  压缩步骤:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;steps&quot;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    - </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>提示词压缩演示
+============================================================
+原始提示词：
+您好！麻烦请你帮我做一件事情，非常感谢。
+
+我想让你帮我分析一下这段文字的情感倾向。
+请你帮我判断这段文字的情感倾向。
+需要你分析情感倾向，包括正面、负面或者中性。
+
+文字内容如下所示：
+
+&quot;今天天气很好，心情愉快！&quot;
+
+请输出情感分析结果。谢谢！
+
+压缩后提示词：
+做一件事情，。我想让你帮我分析一下这段文字的情感倾向。判断这段文字的情感倾向。需要你分析情感倾向，包括正面、负面或者中性。文字内容如下所示：。&quot;今天天气很好，心情愉快。&quot;。请输出情感分析结果
+
+压缩统计：
+  字符数: 124 → 95
+  Token数: 91 → 75
+  Token节省: 17.6%
+  压缩步骤:
+    - 去除礼貌词：节省 21 字符
+    - 去重重复句子：节省 8 字符
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># System Prompt 压缩：用 LLM 压缩长 System Prompt</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compress_system_prompt_with_llm</span><span class="p">(</span><span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    用 LLM 压缩系统提示词，保留核心语义</span>
+<span class="sd">    适用：将 500+ token 的 system prompt 压缩到 100-200 token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compression_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;将以下系统提示词压缩到原来的 1/3 长度，保留所有关键指令和约束，去除冗余解释：</span>
+
+<span class="s2">原始提示词：</span>
+<span class="si">{</span><span class="n">system_prompt</span><span class="si">}</span>
+
+<span class="s2">压缩版本（只输出压缩结果，不要解释）：&quot;&quot;&quot;</span>
+    
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">compression_prompt</span><span class="p">}],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">500</span>
+    <span class="p">)</span>
+    
+    <span class="n">compressed</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">original_tokens</span> <span class="o">=</span> <span class="n">count_tokens</span><span class="p">(</span><span class="n">system_prompt</span><span class="p">)</span>
+    <span class="n">compressed_tokens</span> <span class="o">=</span> <span class="n">count_tokens</span><span class="p">(</span><span class="n">compressed</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;original&quot;</span><span class="p">:</span> <span class="n">system_prompt</span><span class="p">,</span>
+        <span class="s2">&quot;compressed&quot;</span><span class="p">:</span> <span class="n">compressed</span><span class="p">,</span>
+        <span class="s2">&quot;original_tokens&quot;</span><span class="p">:</span> <span class="n">original_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;compressed_tokens&quot;</span><span class="p">:</span> <span class="n">compressed_tokens</span><span class="p">,</span>
+        <span class="s2">&quot;reduction&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">compressed_tokens</span><span class="o">/</span><span class="n">original_tokens</span><span class="p">)</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">}</span>
+
+
+<span class="n">long_system_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;你是一位专业的客服代表，代表我们公司为客户提供优质的服务。</span>
+<span class="s2">在回复客户时，你应该保持友好、专业的态度，始终用礼貌的语气与客户交流。</span>
+<span class="s2">当客户提出问题时，你需要认真倾听他们的需求，理解他们的困惑，然后提供清晰、准确的解答。</span>
+<span class="s2">你的回复应该简洁明了，不要使用过于复杂的术语，确保客户能够理解你的回答。</span>
+<span class="s2">如果客户遇到投诉或不满，你应该先表示理解和同情，然后尽力帮助解决问题。</span>
+<span class="s2">当遇到你无法处理的问题时，应该及时告知客户会转接给专业人员处理。</span>
+<span class="s2">在每次回复结束时，询问客户是否还有其他需要帮助的地方，展现我们对客户的关心。&quot;&quot;&quot;</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">compress_system_prompt_with_llm</span><span class="p">(</span><span class="n">long_system_prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;System Prompt 智能压缩&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;原始（</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;original_tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> tokens）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;original&quot;</span><span class="p">][:</span><span class="mi">200</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">压缩后（</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;compressed_tokens&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> tokens，节省 </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;reduction&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;compressed&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>System Prompt 智能压缩
+============================================================
+原始（171 tokens）：
+你是一位专业的客服代表，代表我们公司为客户提供优质的服务。
+在回复客户时，你应该保持友好、专业的态度，始终用礼貌的语气与客户交流。
+当客户提出问题时，你需要认真倾听他们的需求，理解他们的困惑，然后提供清晰、准确的解答。
+你的回复应该简洁明了，不要使用过于复杂的术语，确保客户能够理解你的回答。
+如果客户遇到投诉或不满，你应该先表示理解和同情，然后尽力帮助解决问题。
+当遇到你无法处理的问题时，应该及时...
+
+压缩后（0 tokens，节省 100.0%）：
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-3">
+<h2>Section 3：语义缓存<a class="headerlink" href="#section-3" title="Link to this heading">#</a></h2>
+<p>对于相似问题，不重复调用 LLM，直接返回缓存结果。这是降低成本最有效的策略之一。</p>
+<p><strong>相似度阈值 = 0.95</strong> 意味着：只有问题在语义上几乎完全相同时才使用缓存。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SemanticCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    语义缓存：基于向量相似度的 LLM 结果缓存</span>
+<span class="sd">    </span>
+<span class="sd">    工作原理：</span>
+<span class="sd">    1. 对每个查询生成 embedding</span>
+<span class="sd">    2. 与缓存中的查询计算余弦相似度</span>
+<span class="sd">    3. 相似度 &gt; threshold 时返回缓存结果</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">similarity_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of {query, embedding, response, hits}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hits&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;misses&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;total_saved_tokens&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_embedding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;获取文本 embedding&quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-embedding-3-small&quot;</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="n">text</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;embedding&quot;</span><span class="p">]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cosine_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec_a</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">vec_b</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;计算余弦相似度&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">NUMPY_AVAILABLE</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec_a</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec_b</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 纯 Python 实现</span>
+            <span class="n">dot</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">vec_a</span><span class="p">,</span> <span class="n">vec_b</span><span class="p">))</span>
+            <span class="n">norm_a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vec_a</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="n">norm_b</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vec_b</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="k">return</span> <span class="n">dot</span> <span class="o">/</span> <span class="p">(</span><span class="n">norm_a</span> <span class="o">*</span> <span class="n">norm_b</span><span class="p">)</span> <span class="k">if</span> <span class="n">norm_a</span> <span class="ow">and</span> <span class="n">norm_b</span> <span class="k">else</span> <span class="mf">0.0</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        查询缓存</span>
+<span class="sd">        Returns: (cached_response, similarity) or (None, 0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.0</span>
+        
+        <span class="n">query_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_embedding</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        
+        <span class="n">best_sim</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">best_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cosine_similarity</span><span class="p">(</span><span class="n">query_emb</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">sim</span> <span class="o">&gt;</span> <span class="n">best_sim</span><span class="p">:</span>
+                <span class="n">best_sim</span> <span class="o">=</span> <span class="n">sim</span>
+                <span class="n">best_entry</span> <span class="o">=</span> <span class="n">entry</span>
+        
+        <span class="k">if</span> <span class="n">best_sim</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
+            <span class="n">best_entry</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">best_entry</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">],</span> <span class="n">best_sim</span>
+        
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">best_sim</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tokens_used</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;存入缓存&quot;&quot;&quot;</span>
+        <span class="n">embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_embedding</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+            <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="n">embedding</span><span class="p">,</span>
+            <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span>
+            <span class="s2">&quot;tokens_used&quot;</span><span class="p">:</span> <span class="n">tokens_used</span><span class="p">,</span>
+            <span class="s2">&quot;hits&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;misses&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;带缓存的 completion&quot;&quot;&quot;</span>
+        <span class="c1"># 尝试缓存</span>
+        <span class="n">cached</span><span class="p">,</span> <span class="n">similarity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="n">cached</span><span class="p">,</span>
+                <span class="s2">&quot;from_cache&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;similarity&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">similarity</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="s2">&quot;tokens_saved&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tokens_used&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">}</span>
+        
+        <span class="c1"># 调用 LLM</span>
+        <span class="k">if</span> <span class="n">messages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">}]</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">usage</span><span class="o">.</span><span class="n">total_tokens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">answer</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;response&quot;</span><span class="p">:</span> <span class="n">answer</span><span class="p">,</span>
+            <span class="s2">&quot;from_cache&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;similarity&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">similarity</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s2">&quot;tokens_used&quot;</span><span class="p">:</span> <span class="n">tokens</span>
+        <span class="p">}</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hit_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;misses&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+
+<span class="c1"># 演示语义缓存效果</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;语义缓存演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">cache</span> <span class="o">=</span> <span class="n">SemanticCache</span><span class="p">(</span><span class="n">similarity_threshold</span><span class="o">=</span><span class="mf">0.92</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">)</span>
+
+<span class="c1"># 模拟一批相似的用户查询</span>
+<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;退款要几天才能到账？&quot;</span><span class="p">,</span>          <span class="c1"># 原始</span>
+    <span class="s2">&quot;退款多久能到？&quot;</span><span class="p">,</span>                 <span class="c1"># 相似</span>
+    <span class="s2">&quot;我申请退款了，几天到账？&quot;</span><span class="p">,</span>        <span class="c1"># 相似</span>
+    <span class="s2">&quot;如何查看订单状态？&quot;</span><span class="p">,</span>             <span class="c1"># 不同主题</span>
+    <span class="s2">&quot;退款大概需要多少工作日？&quot;</span><span class="p">,</span>        <span class="c1"># 相似（与第1个）</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">completion</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;缓存&quot;</span> <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;from_cache&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;API&quot;</span>
+    <span class="n">sim</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;similarity&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">查询: </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  来源: [</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">] 相似度=</span><span class="si">{</span><span class="n">sim</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  回答: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">][:</span><span class="mi">80</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">缓存统计：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  命中率: </span><span class="si">{</span><span class="n">cache</span><span class="o">.</span><span class="n">hit_rate</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  缓存命中次数: </span><span class="si">{</span><span class="n">cache</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  实际 API 调用: </span><span class="si">{</span><span class="n">cache</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;misses&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  节省的 API 调用: </span><span class="si">{</span><span class="n">cache</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">cache</span><span class="o">.</span><span class="n">hit_rate</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>语义缓存演示
+============================================================
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: 退款要几天才能到账？
+  来源: [API] 相似度=0.000
+  回答: 要看退款走哪条通道、哪个商家/哪个银行，时间差别比较大。常见情况和大致时长（仅供参考）：
+
+- 支付宝/微信钱包/平台余额：通常几分钟到24小时内到账，少数情况...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: 退款多久能到？
+  来源: [API] 相似度=0.838
+  回答: 要看你是通过什么渠道付款和商家的退款流程。常见情况大致时间（仅供参考）：
+
+- 商家内部处理：通常 1–7 个工作日，商家确认并发起退款前会有这段时间。  
+-...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: 我申请退款了，几天到账？
+  来源: [API] 相似度=0.828
+  回答: 一般取决于你用的支付方式和商家/平台的处理速度，常见情况大致是：
+
+- 平台/商家处理时间：商家先审核并发起退款，通常需要1–5个工作日（有的平台会更快、也有可...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: 如何查看订单状态？
+  来源: [API] 相似度=0.367
+  回答: 你是在哪个平台或哪个商家下的单？不同平台查看方法有细微差别。下面先给出通用步骤和常见状态说明，你可以按需跟我说具体平台我再给出针对性操作。
+
+通用查看流程
+1....
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: 退款大概需要多少工作日？
+  来源: [API] 相似度=0.764
+  回答: 一般来说退款到账时间取决于商家处理速度和你的支付方式，常见情况大致如下：
+
+- 信用卡/借记卡：商家发起退款后通常需要 5–10 个工作日，有时银行处理慢或跨国...
+
+
+缓存统计：
+  命中率: 0.0%
+  缓存命中次数: 0
+  实际 API 调用: 5
+  节省的 API 调用: 0 (0%)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-4">
+<h2>Section 4：模型路由<a class="headerlink" href="#section-4" title="Link to this heading">#</a></h2>
+<p>根据任务复杂度自动选择合适的模型。简单任务用小模型，复杂任务用大模型。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">classify_complexity</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">classifier_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    用小模型判断任务复杂度</span>
+<span class="sd">    Returns: &quot;simple&quot; | &quot;medium&quot; | &quot;complex&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">classification_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;判断以下任务的复杂度，只输出一个词：simple/medium/complex</span>
+
+<span class="s2">判断标准：</span>
+<span class="s2">- simple: 事实查询、简单翻译、格式转换、基础问答（无需推理）</span>
+<span class="s2">- medium: 摘要、改写、简单分析、基础代码（需要一定推理）</span>
+<span class="s2">- complex: 复杂推理、多步骤分析、高质量创作、专业领域问题</span>
+
+<span class="s2">任务：</span><span class="si">{</span><span class="n">prompt</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="si">}</span>
+
+<span class="s2">复杂度（只输出 simple/medium/complex）：&quot;&quot;&quot;</span>
+    
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">classifier_model</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">classification_prompt</span><span class="p">}],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">10</span>
+    <span class="p">)</span>
+    
+    <span class="n">label</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;medium&quot;</span>  <span class="c1"># 默认</span>
+    <span class="k">return</span> <span class="n">label</span>
+
+
+<span class="c1"># 路由规则</span>
+<span class="n">ROUTING_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;simple&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cost_per_1k_tokens&quot;</span><span class="p">:</span> <span class="mf">0.000375</span><span class="p">,</span>  <span class="c1"># $0.15/M input + $0.60/M output 平均</span>
+        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;简单任务，小模型足够&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;medium&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cost_per_1k_tokens&quot;</span><span class="p">:</span> <span class="mf">0.000375</span><span class="p">,</span>
+        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;中等任务，mini 模型性价比高&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;complex&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cost_per_1k_tokens&quot;</span><span class="p">:</span> <span class="mf">0.00625</span><span class="p">,</span>  <span class="c1"># $2.5/M input + $10/M output 平均</span>
+        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;复杂任务，需要最强模型&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">smart_route</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;智能路由：根据复杂度选择模型&quot;&quot;&quot;</span>
+    <span class="n">complexity</span> <span class="o">=</span> <span class="n">classify_complexity</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ROUTING_CONFIG</span><span class="p">[</span><span class="n">complexity</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;complexity&quot;</span><span class="p">:</span> <span class="n">complexity</span><span class="p">,</span>
+        <span class="s2">&quot;routed_model&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;reason&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;cost_per_1k&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;cost_per_1k_tokens&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+
+<span class="c1"># 测试 10 个不同复杂度的任务</span>
+<span class="n">test_prompts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;把 &#39;Hello&#39; 翻译成中文&quot;</span><span class="p">,</span> <span class="s2">&quot;simple&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;今天是星期几？&quot;</span><span class="p">,</span> <span class="s2">&quot;simple&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;将以下 JSON 格式化：{a:1,b:2}&quot;</span><span class="p">,</span> <span class="s2">&quot;simple&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;总结以下文章的主要观点（500字文章）&quot;</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;写一个 Python 函数实现二分查找&quot;</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;分析这家公司的竞争优势和潜在风险&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;设计一个分布式缓存系统的架构方案，考虑一致性、可用性和分区容错性的权衡&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;智能模型路由演示&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;任务&#39;</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;分类&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;路由到&#39;</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;成本/1K&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+
+<span class="n">total_smart_cost</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">total_naive_cost</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># 如果全用 gpt-4o</span>
+
+<span class="k">for</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">expected</span> <span class="ow">in</span> <span class="n">test_prompts</span><span class="p">:</span>
+    <span class="n">route</span> <span class="o">=</span> <span class="n">smart_route</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    
+    <span class="n">smart_cost</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;cost_per_1k&quot;</span><span class="p">]</span>
+    <span class="n">naive_cost</span> <span class="o">=</span> <span class="n">ROUTING_CONFIG</span><span class="p">[</span><span class="s2">&quot;complex&quot;</span><span class="p">][</span><span class="s2">&quot;cost_per_1k_tokens&quot;</span><span class="p">]</span>  <span class="c1"># gpt-4o</span>
+    
+    <span class="n">total_smart_cost</span> <span class="o">+=</span> <span class="n">smart_cost</span>
+    <span class="n">total_naive_cost</span> <span class="o">+=</span> <span class="n">naive_cost</span>
+    
+    <span class="n">match</span> <span class="o">=</span> <span class="s2">&quot;✅&quot;</span> <span class="k">if</span> <span class="n">route</span><span class="p">[</span><span class="s2">&quot;complexity&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">expected</span> <span class="k">else</span> <span class="s2">&quot;⚠️&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">match</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">prompt</span><span class="p">[:</span><span class="mi">38</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;38</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">route</span><span class="p">[</span><span class="s1">&#39;complexity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">route</span><span class="p">[</span><span class="s1">&#39;routed_model&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">smart_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">savings</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_naive_cost</span> <span class="o">-</span> <span class="n">total_smart_cost</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_naive_cost</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">成本对比：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  全用 GPT-4o：    $</span><span class="si">{</span><span class="n">total_naive_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> per 1K tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  智能路由后：     $</span><span class="si">{</span><span class="n">total_smart_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> per 1K tokens&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  成本节省:        </span><span class="si">{</span><span class="n">savings</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>智能模型路由演示
+======================================================================
+任务                                             分类 路由到             成本/1K
+----------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 把 &#39;Hello&#39; 翻译成中文                          simple gpt-4o-mini     $0.000375
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 今天是星期几？                                  simple gpt-4o-mini     $0.000375
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 将以下 JSON 格式化：{a:1,b:2}                   simple gpt-4o-mini     $0.000375
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 总结以下文章的主要观点（500字文章）                      medium gpt-4o-mini     $0.000375
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 写一个 Python 函数实现二分查找                      medium gpt-4o-mini     $0.000375
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 分析这家公司的竞争优势和潜在风险                        complex gpt-4o          $0.006250
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✅ 设计一个分布式缓存系统的架构方案，考虑一致性、可用性和分区容错性的权衡     complex gpt-4o          $0.006250
+----------------------------------------------------------------------
+
+成本对比：
+  全用 GPT-4o：    $0.043750 per 1K tokens
+  智能路由后：     $0.014375 per 1K tokens
+  成本节省:        67.1%
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-5">
+<h2>Section 5：批量处理<a class="headerlink" href="#section-5" title="Link to this heading">#</a></h2>
+<p>并行处理多个请求，不影响总 token 成本，但大幅减少总耗时（间接提升吞吐量，降低服务器成本）。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+
+<span class="c1"># 生成 10 个测试任务</span>
+<span class="n">batch_tasks</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">f</span><span class="s2">&quot;用一句话解释：</span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;什么是API&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是云计算&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是机器学习&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;什么是区块链&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是微服务&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是DevOps&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;什么是Kubernetes&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是GraphQL&quot;</span><span class="p">,</span> <span class="s2">&quot;什么是WebAssembly&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;什么是边缘计算&quot;</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">single_request</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;单次同步请求&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}],</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sequential_requests</span><span class="p">(</span><span class="n">prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;顺序处理请求&quot;&quot;&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">responses</span> <span class="o">=</span> <span class="p">[</span><span class="n">single_request</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prompts</span><span class="p">]</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;responses&quot;</span><span class="p">:</span> <span class="n">responses</span><span class="p">,</span> <span class="s2">&quot;elapsed&quot;</span><span class="p">:</span> <span class="n">elapsed</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompts</span><span class="p">)}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parallel_requests</span><span class="p">(</span><span class="n">prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL</span><span class="p">,</span> <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;并行处理请求（ThreadPoolExecutor，Jupyter 兼容）&quot;&quot;&quot;</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">responses</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">future_to_idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">single_request</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span> <span class="n">i</span>
+                         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prompts</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">future_to_idx</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">future_to_idx</span><span class="p">[</span><span class="n">future</span><span class="p">]</span>
+            <span class="n">responses</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;responses&quot;</span><span class="p">:</span> <span class="n">responses</span><span class="p">,</span> <span class="s2">&quot;elapsed&quot;</span><span class="p">:</span> <span class="n">elapsed</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompts</span><span class="p">)}</span>
+
+
+<span class="c1"># 对比测试（各 5 个，避免耗时过长）</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="n">batch_tasks</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;批量处理对比：</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span><span class="si">}</span><span class="s2"> 个请求&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[1/2] 顺序处理中...&quot;</span><span class="p">)</span>
+<span class="n">seq_result</span> <span class="o">=</span> <span class="n">sequential_requests</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  顺序耗时: </span><span class="si">{</span><span class="n">seq_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s  (</span><span class="si">{</span><span class="n">seq_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s/请求)&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[2/2] 并行处理中（5 线程）...&quot;</span><span class="p">)</span>
+<span class="n">par_result</span> <span class="o">=</span> <span class="n">parallel_requests</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  并行耗时: </span><span class="si">{</span><span class="n">par_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s  (</span><span class="si">{</span><span class="n">par_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s/请求)&quot;</span><span class="p">)</span>
+
+<span class="n">speedup</span> <span class="o">=</span> <span class="n">seq_result</span><span class="p">[</span><span class="s2">&quot;elapsed&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">par_result</span><span class="p">[</span><span class="s2">&quot;elapsed&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">par_result</span><span class="p">[</span><span class="s2">&quot;elapsed&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">加速比: </span><span class="si">{</span><span class="n">speedup</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;时间节省: </span><span class="si">{</span><span class="n">seq_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">par_result</span><span class="p">[</span><span class="s1">&#39;elapsed&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">注：token 成本相同，但总延迟大幅降低，服务器资源利用率更高&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">示例回答（前3个）：&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">resp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sample</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">par_result</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Q: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  A: </span><span class="si">{</span><span class="n">resp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>批量处理对比：5 个请求
+============================================================
+[1/2] 顺序处理中...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  顺序耗时: 6.23s  (1.25s/请求)
+
+[2/2] 并行处理中（5 线程）...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  并行耗时: 1.40s  (0.28s/请求)
+
+加速比: 4.4x
+时间节省: 4.8s
+
+注：token 成本相同，但总延迟大幅降低，服务器资源利用率更高
+
+示例回答（前3个）：
+  Q: 用一句话解释：什么是API
+  A: 
+
+  Q: 用一句话解释：什么是云计算
+  A: 
+
+  Q: 用一句话解释：什么是机器学习
+  A: 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-6">
+<h2>Section 6：输出长度控制<a class="headerlink" href="#section-6" title="Link to this heading">#</a></h2>
+<p>输出 token 的成本通常是输入的 2-5 倍。控制输出长度是降低成本的有效手段。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 三种输出长度控制策略对比</span>
+
+<span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;解释什么是机器学习&quot;</span>
+
+<span class="n">strategies</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;无约束（基准）&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">}],</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;明确长度指令&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">，用50字以内回答&quot;</span><span class="p">}],</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;max_tokens 硬限制&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">}],</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;stop 序列&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">，用一句话。&quot;</span><span class="p">}],</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;。&quot;</span><span class="p">,</span> <span class="s2">&quot;！&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;长度+max_tokens 组合&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">，30字以内，直接回答&quot;</span><span class="p">}],</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;输出长度控制策略对比&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;策略&#39;</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;输出token&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;输出内容&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+
+<span class="n">baseline_tokens</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">_c</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    
+    <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">completion_tokens</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">usage</span><span class="o">.</span><span class="n">completion_tokens</span>
+    
+    <span class="k">if</span> <span class="n">baseline_tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">baseline_tokens</span> <span class="o">=</span> <span class="n">completion_tokens</span>
+    
+    <span class="n">reduction</span> <span class="o">=</span> <span class="p">(</span><span class="n">baseline_tokens</span> <span class="o">-</span> <span class="n">completion_tokens</span><span class="p">)</span> <span class="o">/</span> <span class="n">baseline_tokens</span> <span class="k">if</span> <span class="n">baseline_tokens</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">reduction_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(-</span><span class="si">{</span><span class="n">reduction</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">reduction</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;(基准)&quot;</span>
+    
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;strategy&quot;</span><span class="p">:</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">completion_tokens</span><span class="p">,</span> <span class="s2">&quot;reduction&quot;</span><span class="p">:</span> <span class="n">reduction</span><span class="p">})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">completion_tokens</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2"> tokens </span><span class="si">{</span><span class="n">reduction_str</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">output</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最高压缩: </span><span class="si">{</span><span class="n">best</span><span class="p">[</span><span class="s1">&#39;strategy&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (节省 </span><span class="si">{</span><span class="n">best</span><span class="p">[</span><span class="s1">&#39;reduction&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2"> 输出 tokens)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">建议: 在 system prompt 中始终设置长度期望，配合 max_tokens 作为安全网&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>输出长度控制策略对比
+======================================================================
+策略                        输出token 输出内容
+----------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>无约束（基准）                  1127 tokens     (基准)  简短定义
+- 机器学习（Machine Learning，简称 ML）是人工智能的一个分支，研究如何...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>明确长度指令                    349 tokens   (-69%)  机器学习是让计算机从数据中自动学习并改进决策或预测能力。...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>max_tokens 硬限制             80 tokens   (-93%)  ...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>stop 序列                   164 tokens   (-85%)  机器学习是让计算机通过从数据中自动学习规律，从而在新数据上进行预测或决策的技术。...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>长度+max_tokens 组合           60 tokens   (-95%)  ...
+----------------------------------------------------------------------
+
+最高压缩: 长度+max_tokens 组合 (节省 95% 输出 tokens)
+
+建议: 在 system prompt 中始终设置长度期望，配合 max_tokens 作为安全网
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-7">
+<h2>Section 7：极端成本场景优化<a class="headerlink" href="#section-7" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 成本优化检查清单与预期节省</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LLM 成本优化完整检查清单&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+
+<span class="n">optimizations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;模型降级（GPT-4o → GPT-4o-mini）&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;85-95%&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;低&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;质量可能下降&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;结构化输出、简单问答&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;语义缓存&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;30-70%&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;中&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;缓存失效风险&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;重复类查询（FAQ、搜索）&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;提示词压缩&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;10-30%&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;低&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;可能丢失细节&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;所有场景&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;输出长度控制&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;20-50%&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;低&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;可能截断重要内容&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;对话、问答类场景&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;智能模型路由&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;40-70%&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;中&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;路由误判&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;混合复杂度的任务&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;批量处理（并行）&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;0%（token相同）&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;中&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;并发限制&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;批量数据处理&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;微调小模型替代大模型&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;90%+&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;高&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;需要数据、维护成本&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;高量重复任务（&gt;100万/天）&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;technique&quot;</span><span class="p">:</span> <span class="s2">&quot;自托管开源模型&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;savings&quot;</span><span class="p">:</span> <span class="s2">&quot;70-95%（大规模时）&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effort&quot;</span><span class="p">:</span> <span class="s2">&quot;高&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;risk&quot;</span><span class="p">:</span> <span class="s2">&quot;运维成本、性能&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;best_for&quot;</span><span class="p">:</span> <span class="s2">&quot;隐私要求高或超大规模&quot;</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;技术&#39;</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;节省&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;实施难度&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;风险&#39;</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;最适合&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">95</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">optimizations</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;technique&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;30</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;savings&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;effort&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;risk&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;best_for&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;组合优化效果估算（1M 请求/天，使用 GPT-4o 为基准）：&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">75</span><span class="p">)</span>
+
+<span class="n">baseline_daily</span> <span class="o">=</span> <span class="mi">2500</span>  <span class="c1"># $2500/天（GPT-4o，500 tokens/请求）</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;基准成本（GPT-4o）:                    $</span><span class="si">{</span><span class="n">baseline_daily</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天&quot;</span><span class="p">)</span>
+<span class="n">after_model</span> <span class="o">=</span> <span class="n">baseline_daily</span> <span class="o">*</span> <span class="mf">0.10</span>   <span class="c1"># 模型降级节省 90%</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;+ 模型降级到 GPT-4o-mini:              $</span><span class="si">{</span><span class="n">after_model</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天 (节省 90%)&quot;</span><span class="p">)</span>
+<span class="n">after_cache</span> <span class="o">=</span> <span class="n">after_model</span> <span class="o">*</span> <span class="mf">0.50</span>      <span class="c1"># 缓存命中率 50%</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;+ 语义缓存（50% 命中率）:              $</span><span class="si">{</span><span class="n">after_cache</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天 (再节省 50%)&quot;</span><span class="p">)</span>
+<span class="n">after_compress</span> <span class="o">=</span> <span class="n">after_cache</span> <span class="o">*</span> <span class="mf">0.80</span>   <span class="c1"># 压缩提示词节省 20%</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;+ 提示词压缩（20%）:                   $</span><span class="si">{</span><span class="n">after_compress</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天 (再节省 20%)&quot;</span><span class="p">)</span>
+<span class="n">after_length</span> <span class="o">=</span> <span class="n">after_compress</span> <span class="o">*</span> <span class="mf">0.70</span>  <span class="c1"># 控制输出长度节省 30%</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;+ 输出长度控制（30%）:                 $</span><span class="si">{</span><span class="n">after_length</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天 (再节省 30%)&quot;</span><span class="p">)</span>
+<span class="n">total_saving</span> <span class="o">=</span> <span class="p">(</span><span class="n">baseline_daily</span> <span class="o">-</span> <span class="n">after_length</span><span class="p">)</span> <span class="o">/</span> <span class="n">baseline_daily</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">组合优化后总成本:                      $</span><span class="si">{</span><span class="n">after_length</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">/天&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;总节省:                                </span><span class="si">{</span><span class="n">total_saving</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">baseline_daily</span><span class="o">-</span><span class="n">after_length</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> USD/天)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;年度节省:                              $</span><span class="si">{</span><span class="p">(</span><span class="n">baseline_daily</span><span class="o">-</span><span class="n">after_length</span><span class="p">)</span><span class="o">*</span><span class="mi">365</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> USD&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>===========================================================================
+LLM 成本优化完整检查清单
+===========================================================================
+
+技术                                     节省     实施难度 风险                   最适合
+-----------------------------------------------------------------------------------------------
+模型降级（GPT-4o → GPT-4o-mini）         85-95%        低 质量可能下降               结构化输出、简单问答
+语义缓存                               30-70%        中 缓存失效风险               重复类查询（FAQ、搜索）
+提示词压缩                              10-30%        低 可能丢失细节               所有场景
+输出长度控制                             20-50%        低 可能截断重要内容             对话、问答类场景
+智能模型路由                             40-70%        中 路由误判                 混合复杂度的任务
+批量处理（并行）                       0%（token相同）        中 并发限制                 批量数据处理
+微调小模型替代大模型                           90%+        高 需要数据、维护成本            高量重复任务（&gt;100万/天）
+自托管开源模型                        70-95%（大规模时）        高 运维成本、性能              隐私要求高或超大规模
+
+===========================================================================
+组合优化效果估算（1M 请求/天，使用 GPT-4o 为基准）：
+===========================================================================
+基准成本（GPT-4o）:                    $2,500/天
++ 模型降级到 GPT-4o-mini:              $250/天 (节省 90%)
++ 语义缓存（50% 命中率）:              $125/天 (再节省 50%)
++ 提示词压缩（20%）:                   $100/天 (再节省 20%)
++ 输出长度控制（30%）:                 $70/天 (再节省 30%)
+
+组合优化后总成本:                      $70/天
+总节省:                                97% (2,430 USD/天)
+年度节省:                              $886,950 USD
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/07_production"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01_evaluation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">第七章：生产环境 — 01 LLM 评估</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_observability.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">第七章：生产环境 — 03 可观测性与监控</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">成本优化全景图</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-1-token">Section 1：Token 成本核算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-2">Section 2：提示词压缩</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-3">Section 3：语义缓存</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-4">Section 4：模型路由</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-5">Section 5：批量处理</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-6">Section 6：输出长度控制</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#section-7">Section 7：极端成本场景优化</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

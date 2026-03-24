@@ -1,0 +1,1185 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>第4章 RAG — 02 Embedding 与语义搜索 &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04_rag/02_embeddings_search';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="向量数据库：ChromaDB 实战" href="03_vector_db.html" />
+    <link rel="prev" title="第4章 RAG — 01 文档切块（Chunking）" href="01_chunking.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/02_chain_of_thought.html">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../02_prompting/03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/04_rag/02_embeddings_search.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/04_rag/02_embeddings_search.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>第4章 RAG — 02 Embedding 与语义搜索</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embedding">第一节：生成 Embedding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosine-similarity">第二节：余弦相似度（Cosine Similarity）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplevectorindex">第三节：构建简单向量索引（SimpleVectorIndex）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">第四节：语义搜索 vs 关键词搜索</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embedding-caching">第五节：Embedding 缓存（Caching）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">扩展：持久化缓存</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">小结</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="rag-02-embedding">
+<h1>第4章 RAG — 02 Embedding 与语义搜索<a class="headerlink" href="#rag-02-embedding" title="Link to this heading">#</a></h1>
+<p>Embedding（嵌入）把文字转成向量，语义相似的文字在向量空间中距离近。这是 RAG 检索的核心。</p>
+<p>本节将从零实现一个完整的语义搜索系统，涵盖：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>步骤</p></th>
+<th class="head"><p>内容</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>调用 Embedding 模型，获取文本向量</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>用余弦相似度衡量语义距离</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>构建简单向量索引，实现 Top-K 检索</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>语义搜索 vs 关键词搜索的对比</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Embedding 缓存，避免重复计算</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<div><p><strong>前置要求</strong>：已配置 <code class="docutils literal notranslate"><span class="pre">EMBED_MODEL</span></code> 环境变量（或使用默认的 <code class="docutils literal notranslate"><span class="pre">openai/text-embedding-3-small</span></code>）</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics.pairwise</span><span class="w"> </span><span class="kn">import</span> <span class="n">cosine_similarity</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">litellm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># Embedding 模型配置</span>
+<span class="n">EMBED_MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;EMBED_MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;openai/text-embedding-3-small&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Embedding 模型: </span><span class="si">{</span><span class="n">EMBED_MODEL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NumPy 版本: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Embedding 模型: openai/text-embedding-3-small
+NumPy 版本: 2.4.3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="embedding">
+<h2>第一节：生成 Embedding<a class="headerlink" href="#embedding" title="Link to this heading">#</a></h2>
+<p>通过 <code class="docutils literal notranslate"><span class="pre">litellm.embedding()</span></code> 调用任意 Embedding 模型（OpenAI、Cohere、本地模型等），
+返回一个高维浮点数向量。向量的每个维度代表文本的某种语义特征。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text-embedding-3-small</span></code>：1536 维，性价比高</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text-embedding-3-large</span></code>：3072 维，精度更高</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">EMBED_MODEL</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    获取文本的 Embedding 向量</span>
+<span class="sd">    :param text: 输入文本字符串</span>
+<span class="sd">    :param model: Embedding 模型名称</span>
+<span class="sd">    :return: numpy.ndarray，形状为 (dim,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">litellm</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="n">text</span><span class="p">])</span>
+    <span class="n">vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;embedding&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">vector</span>
+
+
+<span class="c1"># 演示：对一句话生成 Embedding</span>
+<span class="n">sample_sentence</span> <span class="o">=</span> <span class="s2">&quot;人工智能正在改变世界&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;输入文本: </span><span class="si">{</span><span class="n">sample_sentence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;正在调用 Embedding 模型...&quot;</span><span class="p">)</span>
+
+<span class="n">vec</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">sample_sentence</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">向量维度: </span><span class="si">{</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;向量数据类型: </span><span class="si">{</span><span class="n">vec</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;向量 L2 范数: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">前 8 个维度的值:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">vec</span><span class="p">[:</span><span class="mi">8</span><span class="p">],</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>输入文本: 人工智能正在改变世界
+正在调用 Embedding 模型...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>向量维度: 1536
+向量数据类型: float64
+向量 L2 范数: 1.0002
+
+前 8 个维度的值:
+[ 0.0364  0.0006  0.0407  0.0559  0.0335 -0.0342 -0.0125  0.0756]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="cosine-similarity">
+<h2>第二节：余弦相似度（Cosine Similarity）<a class="headerlink" href="#cosine-similarity" title="Link to this heading">#</a></h2>
+<p>余弦相似度衡量两个向量夹角的余弦值，取值范围 <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code>：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code>：完全相同</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code>：无关</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-1.0</span></code>：完全相反</p></li>
+</ul>
+<p>对5个句子（涵盖相似和不同主题）计算两两余弦相似度矩阵，直观看出语义距离。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5 个句子：混合相似和不同主题</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;深度学习是机器学习的一个重要分支&quot;</span><span class="p">,</span>           <span class="c1"># 0 - AI/ML</span>
+    <span class="s2">&quot;神经网络可以从大量数据中自动学习特征&quot;</span><span class="p">,</span>        <span class="c1"># 1 - AI/ML（与0相似）</span>
+    <span class="s2">&quot;Transformer 模型彻底改变了自然语言处理&quot;</span><span class="p">,</span>      <span class="c1"># 2 - NLP</span>
+    <span class="s2">&quot;今天天气晴朗，非常适合户外运动&quot;</span><span class="p">,</span>              <span class="c1"># 3 - 天气（不同主题）</span>
+    <span class="s2">&quot;篮球比赛非常精彩，球迷们热情高涨&quot;</span><span class="p">,</span>            <span class="c1"># 4 - 体育（不同主题）</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;正在为 5 个句子生成 Embedding...&quot;</span><span class="p">)</span>
+<span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">get_embedding</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Embedding 矩阵形状: </span><span class="si">{</span><span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">  (句子数 × 向量维度)&quot;</span><span class="p">)</span>
+
+<span class="c1"># 计算余弦相似度矩阵</span>
+<span class="n">sim_matrix</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">vectors</span><span class="p">)</span>  <span class="c1"># shape: (5, 5)</span>
+
+<span class="c1"># 格式化打印矩阵</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">余弦相似度矩阵（行=句子索引，列=句子索引）:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">     &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  S</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">  &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">38</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sim_matrix</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> | &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="se">\u2190</span><span class="s2"> </span><span class="si">{</span><span class="n">sentences</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="se">\u2190</span><span class="s2"> </span><span class="si">{</span><span class="n">sentences</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+
+<span class="c1"># 找出相似度最高的非对角线对</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">最相似的句子对（排除自身）:&quot;</span><span class="p">)</span>
+<span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)):</span>
+        <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sim_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+
+<span class="n">pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">sim</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[:</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [</span><span class="si">{</span><span class="n">sim</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">] S</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> vs S</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">: </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">sentences</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">15</span><span class="p">]</span><span class="si">}</span><span class="s2">...</span><span class="se">\&quot;</span><span class="s2"> </span><span class="se">\u2194</span><span class="s2"> </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">sentences</span><span class="p">[</span><span class="n">j</span><span class="p">][:</span><span class="mi">15</span><span class="p">]</span><span class="si">}</span><span class="s2">...</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>正在为 5 个句子生成 Embedding...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Embedding 矩阵形状: (5, 1536)  (句子数 × 向量维度)
+
+余弦相似度矩阵（行=句子索引，列=句子索引）:
+
+       S0    S1    S2    S3    S4  
+--------------------------------------
+S0 | 1.000 0.423 0.373 0.109 0.135   ← 深度学习是机器学习的一个重要分支
+S1 | 0.423 1.000 0.349 0.080 0.151   ← 神经网络可以从大量数据中自动学习特征
+S2 | 0.373 0.349 1.000 0.106 0.073   ← Transformer 模型彻底改变...
+S3 | 0.109 0.080 0.106 1.000 0.346   ← 今天天气晴朗，非常适合户外运动
+S4 | 0.135 0.151 0.073 0.346 1.000   ← 篮球比赛非常精彩，球迷们热情高涨
+
+最相似的句子对（排除自身）:
+  [0.423] S0 vs S1: &quot;深度学习是机器学习的一个重要分...&quot; ↔ &quot;神经网络可以从大量数据中自动学...&quot;
+  [0.373] S0 vs S2: &quot;深度学习是机器学习的一个重要分...&quot; ↔ &quot;Transformer 模型彻...&quot;
+  [0.349] S1 vs S2: &quot;神经网络可以从大量数据中自动学...&quot; ↔ &quot;Transformer 模型彻...&quot;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="simplevectorindex">
+<h2>第三节：构建简单向量索引（SimpleVectorIndex）<a class="headerlink" href="#simplevectorindex" title="Link to this heading">#</a></h2>
+<p>向量索引的核心操作：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">add(texts)</span></code>：批量添加文本，存储其 Embedding 向量</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">search(query,</span> <span class="pre">top_k)</span></code>：对查询文本也生成 Embedding，计算与所有存储向量的余弦相似度，返回 Top-K</p></li>
+</ul>
+<p>这是生产级向量数据库（Faiss、Chroma、Weaviate）的简化原理。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SimpleVectorIndex</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    基于 NumPy 的简单向量索引</span>
+<span class="sd">    支持批量添加文本和 Top-K 语义搜索</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_model</span><span class="o">=</span><span class="n">EMBED_MODEL</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embed_model</span> <span class="o">=</span> <span class="n">embed_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>          <span class="c1"># 原始文本列表</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="o">=</span> <span class="kc">None</span>      <span class="c1"># 向量矩阵 (N, dim)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        批量添加文本到索引</span>
+<span class="sd">        :param texts: List[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;正在为 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条文本生成 Embedding...&quot;</span><span class="p">)</span>
+        <span class="n">new_vectors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">:</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embed_model</span><span class="p">)</span>
+            <span class="n">new_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="n">new_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_vectors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="o">=</span> <span class="n">new_matrix</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vectors</span><span class="p">,</span> <span class="n">new_matrix</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;索引中共有 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条文本&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        语义搜索</span>
+<span class="sd">        :param query: 查询文本</span>
+<span class="sd">        :param top_k: 返回最相似的 K 条</span>
+<span class="sd">        :return: List of (score, text)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;索引为空，请先调用 add()&quot;</span><span class="p">)</span>
+
+        <span class="n">query_vec</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embed_model</span><span class="p">)</span>
+        <span class="n">query_vec</span> <span class="o">=</span> <span class="n">query_vec</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>          <span class="c1"># (1, dim)</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">query_vec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># (N,)</span>
+        <span class="n">top_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">scores</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="n">top_k</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">top_indices</span><span class="p">]</span>
+
+
+<span class="c1"># ---- 演示 ----</span>
+<span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;机器学习是让计算机从数据中自动学习的技术&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;深度神经网络由多层感知机堆叠而成&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;卷积神经网络擅长处理图像识别任务&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;自然语言处理让计算机理解人类语言&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;大语言模型通过海量文本预训练获得语言能力&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;强化学习通过奖励信号训练智能体做决策&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Python 是数据科学最流行的编程语言&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;向量数据库用于存储和检索高维 Embedding&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;今天股市大涨，沪指突破3500点&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;足球世界杯吸引了全球数十亿观众观看&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">index</span> <span class="o">=</span> <span class="n">SimpleVectorIndex</span><span class="p">()</span>
+<span class="n">index</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># 搜索</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;机器学习算法&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">查询: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Top-</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> [相似度=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>正在为 10 条文本生成 Embedding...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>索引中共有 10 条文本
+
+查询: &#39;机器学习算法&#39;
+--------------------------------------------------
+Top-1 [相似度=0.6591]: 机器学习是让计算机从数据中自动学习的技术
+Top-2 [相似度=0.5035]: 自然语言处理让计算机理解人类语言
+Top-3 [相似度=0.4257]: 强化学习通过奖励信号训练智能体做决策
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vs">
+<h2>第四节：语义搜索 vs 关键词搜索<a class="headerlink" href="#vs" title="Link to this heading">#</a></h2>
+<p><strong>关键词搜索</strong>（字符串匹配）：只能找到包含查询词的文本，无法理解同义词或相关概念。</p>
+<p><strong>语义搜索</strong>（Embedding 相似度）：理解查询意图，即使没有完全匹配的词汇也能找到相关内容。</p>
+<p>用同一个语料库和查询词，并排展示两种方法的差异。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">keyword_search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    基础关键词搜索：统计查询词中各字在文本中出现的次数作为分数</span>
+<span class="sd">    :param query: 查询字符串</span>
+<span class="sd">    :param texts: 语料库 List[str]</span>
+<span class="sd">    :param top_k: 返回 Top-K</span>
+<span class="sd">    :return: List of (score, text)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scored</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">query_chars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>  <span class="c1"># 简单用字符级匹配</span>
+
+    <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">:</span>
+        <span class="c1"># 计算查询词中有多少字出现在文本里</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">query_chars</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">scored</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">score</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+
+    <span class="n">scored</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># 过滤掉分数为 0 的结果</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">scored</span><span class="p">[:</span><span class="n">top_k</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="c1"># 同一语料库（已在上一节的 index 中）</span>
+<span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;深度学习模型训练技巧&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;查询: &#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="c1"># --- 关键词搜索 ---</span>
+<span class="n">kw_results</span> <span class="o">=</span> <span class="n">keyword_search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">corpus</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[关键词搜索结果]&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">kw_results</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kw_results</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Top-</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> [匹配字数=</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  无匹配结果&quot;</span><span class="p">)</span>
+
+<span class="c1"># --- 语义搜索 ---</span>
+<span class="n">sem_results</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[语义搜索结果]&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sem_results</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Top-</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> [相似度=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">]: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 差异分析</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;差异分析:&quot;</span><span class="p">)</span>
+<span class="n">kw_texts</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">kw_results</span><span class="p">}</span>
+<span class="n">sem_texts</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">sem_results</span><span class="p">}</span>
+<span class="n">only_semantic</span> <span class="o">=</span> <span class="n">sem_texts</span> <span class="o">-</span> <span class="n">kw_texts</span>
+<span class="k">if</span> <span class="n">only_semantic</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;语义搜索找到但关键词搜索未找到的结果:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">only_semantic</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="se">\u2192</span><span class="s2"> </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;两种方法结果相同&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>查询: &#39;深度学习模型训练技巧&#39;
+============================================================
+
+[关键词搜索结果]
+  Top-1 [匹配字数=4]: 大语言模型通过海量文本预训练获得语言能力
+  Top-2 [匹配字数=4]: 强化学习通过奖励信号训练智能体做决策
+  Top-3 [匹配字数=3]: 机器学习是让计算机从数据中自动学习的技术
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[语义搜索结果]
+  Top-1 [相似度=0.5022]: 大语言模型通过海量文本预训练获得语言能力
+  Top-2 [相似度=0.4782]: 机器学习是让计算机从数据中自动学习的技术
+  Top-3 [相似度=0.4758]: 强化学习通过奖励信号训练智能体做决策
+
+============================================================
+差异分析:
+两种方法结果相同
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="embedding-caching">
+<h2>第五节：Embedding 缓存（Caching）<a class="headerlink" href="#embedding-caching" title="Link to this heading">#</a></h2>
+<p>Embedding API 调用有网络延迟和费用。对于相同的文本，多次调用会返回完全相同的向量。</p>
+<p><strong>缓存策略</strong>：以文本内容的 SHA256 哈希为键，将向量存储在内存字典中。</p>
+<ul class="simple">
+<li><p>首次请求：调用 API，存入缓存（<strong>Cache Miss</strong>）</p></li>
+<li><p>再次请求：直接从缓存读取，无需 API 调用（<strong>Cache Hit</strong>）</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CachedEmbedder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    带缓存的 Embedding 客户端</span>
+<span class="sd">    使用文本 SHA256 哈希作为缓存键，避免重复 API 调用</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">EMBED_MODEL</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># {text_hash: np.ndarray}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hits</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># 缓存命中次数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">misses</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># 缓存未命中次数</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;计算文本的 SHA256 哈希&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        获取 Embedding，优先从缓存读取</span>
+<span class="sd">        :param text: 输入文本</span>
+<span class="sd">        :return: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hits</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># Cache miss：调用 API</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">misses</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vector</span>
+        <span class="k">return</span> <span class="n">vector</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;返回缓存统计信息&quot;&quot;&quot;</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hits</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">misses</span>
+        <span class="n">hit_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hits</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_calls&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hits&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hits</span><span class="p">,</span>
+            <span class="s2">&quot;cache_misses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">misses</span><span class="p">,</span>
+            <span class="s2">&quot;hit_rate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hit_rate</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cached_vectors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">),</span>
+        <span class="p">}</span>
+
+
+<span class="c1"># ---- 演示 ----</span>
+<span class="n">embedder</span> <span class="o">=</span> <span class="n">CachedEmbedder</span><span class="p">()</span>
+
+<span class="n">texts_to_embed</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;人工智能正在快速发展&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;机器学习改变了软件开发方式&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;人工智能正在快速发展&quot;</span><span class="p">,</span>   <span class="c1"># 重复文本，应命中缓存</span>
+    <span class="s2">&quot;深度学习需要大量训练数据&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;机器学习改变了软件开发方式&quot;</span><span class="p">,</span>  <span class="c1"># 重复文本，应命中缓存</span>
+    <span class="s2">&quot;人工智能正在快速发展&quot;</span><span class="p">,</span>   <span class="c1"># 再次重复</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;共 </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">texts_to_embed</span><span class="p">)</span><span class="si">}</span><span class="s2"> 次 embed 调用（含重复文本）</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;调用#&#39;</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Cache&#39;</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;文本&#39;</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">55</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">texts_to_embed</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">_hash</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">is_hit</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">embedder</span><span class="o">.</span><span class="n">_cache</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;HIT  </span><span class="se">\u2713</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">is_hit</span> <span class="k">else</span> <span class="s2">&quot;MISS </span><span class="se">\u2192</span><span class="s2">API&quot;</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&lt;4</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">status</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">text</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">elapsed</span><span class="o">*</span><span class="mi">1000</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">ms)&quot;</span><span class="p">)</span>
+
+<span class="c1"># 打印统计</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">55</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;缓存统计:&quot;</span><span class="p">)</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>共 6 次 embed 调用（含重复文本）
+
+调用#   Cache        文本                                 
+-------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>#1    MISS →API    人工智能正在快速发展                           (305ms)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>#2    MISS →API    机器学习改变了软件开发方式                        (241ms)
+#3    HIT  ✓       人工智能正在快速发展                           (0ms)
+#4    MISS →API    深度学习需要大量训练数据                         (188ms)
+#5    HIT  ✓       机器学习改变了软件开发方式                        (0ms)
+#6    HIT  ✓       人工智能正在快速发展                           (0ms)
+
+=======================================================
+缓存统计:
+  total_calls         : 6
+  cache_hits          : 3
+  cache_misses        : 3
+  hit_rate            : 50.0%
+  cached_vectors      : 3
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id1">
+<h2>扩展：持久化缓存<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>上面的内存缓存在程序重启后会丢失。可以将缓存序列化到磁盘（JSON / SQLite / NumPy），
+下次启动时加载，实现跨会话复用。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PersistentEmbedder</span><span class="p">(</span><span class="n">CachedEmbedder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    持久化 Embedding 缓存（存储为 .npz 文件）</span>
+<span class="sd">    - save()：将缓存写入磁盘</span>
+<span class="sd">    - load()：从磁盘加载缓存</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="s2">&quot;embed_cache.npz&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>  <span class="c1"># 启动时自动加载已有缓存</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;将内存缓存保存到 .npz 文件&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;缓存为空，跳过保存&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># npz 文件的键名不能包含特殊字符，使用索引映射</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">)}</span>
+        <span class="c1"># 将 key 列表也保存进去</span>
+        <span class="n">arrays</span><span class="p">[</span><span class="s2">&quot;__keys__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">,</span> <span class="o">**</span><span class="n">arrays</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缓存已保存: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条向量)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;从 .npz 文件加载缓存&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缓存文件不存在，从空缓存开始: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;__keys__&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缓存已加载: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> 条向量)&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># 演示：保存与加载</span>
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="n">cache_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">&quot;embed_cache.npz&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 第一次：生成并保存</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== 第一次运行（写入缓存）===&quot;</span><span class="p">)</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">PersistentEmbedder</span><span class="p">(</span><span class="n">cache_path</span><span class="o">=</span><span class="n">cache_file</span><span class="p">)</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;向量数据库是 RAG 的核心存储&quot;</span><span class="p">)</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;Embedding 模型将文本映射到高维空间&quot;</span><span class="p">)</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缓存统计: </span><span class="si">{</span><span class="n">p1</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 第二次：加载缓存，无需重新调用 API</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== 第二次运行（读取缓存）===&quot;</span><span class="p">)</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">PersistentEmbedder</span><span class="p">(</span><span class="n">cache_path</span><span class="o">=</span><span class="n">cache_file</span><span class="p">)</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;向量数据库是 RAG 的核心存储&quot;</span><span class="p">)</span>         <span class="c1"># 应命中缓存</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;Embedding 模型将文本映射到高维空间&quot;</span><span class="p">)</span>   <span class="c1"># 应命中缓存</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;全新的文本，缓存中没有&quot;</span><span class="p">)</span>               <span class="c1"># 未命中，调用 API</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缓存统计: </span><span class="si">{</span><span class="n">p2</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=== 第一次运行（写入缓存）===
+缓存文件不存在，从空缓存开始: /var/folders/km/c2z87ytx2fvbh8_v94cn7l4w0000gp/T/tmp13h9651x/embed_cache.npz
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>缓存已保存: /var/folders/km/c2z87ytx2fvbh8_v94cn7l4w0000gp/T/tmp13h9651x/embed_cache.npz  (2 条向量)
+缓存统计: {&#39;total_calls&#39;: 2, &#39;cache_hits&#39;: 0, &#39;cache_misses&#39;: 2, &#39;hit_rate&#39;: &#39;0.0%&#39;, &#39;cached_vectors&#39;: 2}
+
+=== 第二次运行（读取缓存）===
+缓存已加载: /var/folders/km/c2z87ytx2fvbh8_v94cn7l4w0000gp/T/tmp13h9651x/embed_cache.npz  (2 条向量)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>缓存统计: {&#39;total_calls&#39;: 3, &#39;cache_hits&#39;: 2, &#39;cache_misses&#39;: 1, &#39;hit_rate&#39;: &#39;66.7%&#39;, &#39;cached_vectors&#39;: 3}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2>小结<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>Embedding 是 RAG 检索的骨干技术：</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>概念</p></th>
+<th class="head"><p>要点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Embedding</strong></p></td>
+<td><p>文本 → 高维浮点向量，语义相近则向量相近</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>余弦相似度</strong></p></td>
+<td><p>衡量两个向量的方向相似性，与长度无关</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>向量索引</strong></p></td>
+<td><p>存储文本向量，支持快速 Top-K 相似度检索</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>语义 vs 关键词</strong></p></td>
+<td><p>语义搜索理解意图，可跨越词汇差异找到相关内容</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>缓存</strong></p></td>
+<td><p>相同文本的 Embedding 结果固定，缓存可大幅降低成本和延迟</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>下一步</strong>：</p>
+<ul class="simple">
+<li><p>使用生产级向量数据库（Chroma、Faiss、Weaviate、Pinecone）替换 SimpleVectorIndex</p></li>
+<li><p>学习 Hybrid Search（向量搜索 + BM25 关键词搜索的融合）</p></li>
+<li><p>探索 Reranker 模型对检索结果的精排</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/04_rag"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01_chunking.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">第4章 RAG — 01 文档切块（Chunking）</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_vector_db.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">向量数据库：ChromaDB 实战</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embedding">第一节：生成 Embedding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosine-similarity">第二节：余弦相似度（Cosine Similarity）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplevectorindex">第三节：构建简单向量索引（SimpleVectorIndex）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs">第四节：语义搜索 vs 关键词搜索</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embedding-caching">第五节：Embedding 缓存（Caching）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">扩展：持久化缓存</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">小结</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

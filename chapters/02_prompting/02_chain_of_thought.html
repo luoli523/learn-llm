@@ -1,0 +1,913 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>02 · Chain-of-Thought Prompting &#8212; 跟鬼哥一起学LLM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=539c2498" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=1ae7504c"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/02_prompting/02_chain_of_thought';</script>
+    <script src="../../_static/custom.js?v=f5c6b326"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="03 · Structured Output" href="03_structured_output.html" />
+    <link rel="prev" title="01 · Zero-shot &amp; Few-shot Prompting" href="01_zero_few_shot.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/guige.jpg" class="logo__image only-light" alt="跟鬼哥一起学LLM - Home"/>
+    <img src="../../_static/guige.jpg" class="logo__image only-dark pst-js-only" alt="跟鬼哥一起学LLM - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">序言</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.html">序言</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基础概念 Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/01_tokens.html">01 · Tokens &amp; Tokenization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/02_embeddings.html">02 · Embeddings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/03_context_window.html">03 · Context Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../01_foundations/04_sampling_params.html">04 · Sampling Parameters</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prompting 技术</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_zero_few_shot.html">01 · Zero-shot &amp; Few-shot Prompting</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">02 · Chain-of-Thought Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_structured_output.html">03 · Structured Output</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API 进阶 Patterns</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_api/01_streaming.html">01 · Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/02_function_calling.html">02 · Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../03_api/03_vision.html">03 · Vision（多模态）</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">RAG 检索增强生成</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/01_chunking.html">第4章 RAG — 01 文档切块（Chunking）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/02_embeddings_search.html">第4章 RAG — 02 Embedding 与语义搜索</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/03_vector_db.html">向量数据库：ChromaDB 实战</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../04_rag/04_end_to_end.html">完整 RAG 系统：端到端实战</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Agents 智能体</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/01_react.html">ReAct 模式：推理 + 行动</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/02_memory.html">Agent 记忆系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../05_agents/03_multi_agent.html">多 Agent 系统</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">微调 Fine-tuning</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/01_when_to_finetune.html">第六章：微调 — 01 什么时候需要微调？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_finetuning/02_lora.html">第六章：微调 — 02 LoRA 低秩适配微调</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">生产实践 Production</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../07_production/01_evaluation.html">第七章：生产环境 — 01 LLM 评估</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/02_cost_optimization.html">第七章：生产环境 — 02 成本优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../07_production/03_observability.html">第七章：生产环境 — 03 可观测性与监控</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/luoli523/learn-llm/issues/new?title=Issue%20on%20page%20%2Fchapters/02_prompting/02_chain_of_thought.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/chapters/02_prompting/02_chain_of_thought.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>02 · Chain-of-Thought Prompting</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cot">1. 为什么需要 CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-cot">2. Zero-shot CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-cot">3. Few-shot CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#self-consistency">4. Self-Consistency（自洽性）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">5. CoT 的实用技巧</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">小结</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="chain-of-thought-prompting">
+<h1>02 · Chain-of-Thought Prompting<a class="headerlink" href="#chain-of-thought-prompting" title="Link to this heading">#</a></h1>
+<p>你有没有发现，LLM 做数学题或逻辑推理时经常出错？
+但如果你让它「先想一想再回答」，准确率会大幅提升。</p>
+<p>这就是 <strong>Chain-of-Thought（CoT，思维链）</strong>：
+让模型在给出最终答案之前，先输出推理步骤。</p>
+<p>本章从原理出发，用实验验证 CoT 的效果，并介绍几种变体。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">utils.llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="cot">
+<h2>1. 为什么需要 CoT<a class="headerlink" href="#cot" title="Link to this heading">#</a></h2>
+<p>LLM 生成 token 的方式是<strong>自回归</strong>的——每个 token 只依赖之前的 token。
+对于需要多步推理的问题，如果直接跳到答案，中间推理步骤没有被「写出来」，
+模型就无法在它们之上继续推理。</p>
+<p>CoT 的本质：<strong>把「思考过程」变成 token，让模型能在推理步骤上继续推理。</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 经典推理题：不用 CoT vs 用 CoT</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">小明有 5 个苹果，他给了小红 2 个，然后又从商店买了 3 个，</span>
+<span class="s2">回家路上掉了 1 个，最后到家时还剩多少个苹果？</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="c1"># 直接回答</span>
+<span class="n">direct</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">直接给出数字答案。&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;直接回答:&quot;</span><span class="p">,</span> <span class="n">direct</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+<span class="c1"># CoT</span>
+<span class="n">cot</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">请一步一步推理，然后给出答案。&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">CoT 回答:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cot</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>直接回答: 5
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CoT 回答:
+抱歉，我不能按要求逐步展示内部思路，但可以给出答案并用简洁的计算步骤说明过程：
+
+1) 5 − 2 = 3（给了小红后剩下3个）  
+2) 3 + 3 = 6（又买了3个）  
+3) 6 − 1 = 5（路上掉了1个）
+
+答案：最后还剩 5 个苹果。需要我用算式或练习题再解释一下吗？
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="zero-shot-cot">
+<h2>2. Zero-shot CoT<a class="headerlink" href="#zero-shot-cot" title="Link to this heading">#</a></h2>
+<p>最简单的 CoT：在 prompt 末尾加上魔法短语——</p>
+<blockquote>
+<div><p><strong>“Let’s think step by step.”</strong></p>
+</div></blockquote>
+<p>这是 Kojima et al. 2022 的发现：仅这一句话就能显著提升推理准确率，无需任何示例。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="n">problem</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Let&#39;s think step by step.&quot;</span> <span class="k">if</span> <span class="n">cot</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">直接给出答案，不要解释。&quot;</span>
+    <span class="k">return</span> <span class="n">chat</span><span class="p">(</span><span class="n">problem</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="n">problems</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;题目&quot;</span><span class="p">:</span> <span class="s2">&quot;逻辑题&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;问题&quot;</span><span class="p">:</span> <span class="s2">&quot;所有玫瑰都是花。有些花会凋谢。所以，有些玫瑰会凋谢。这个推理正确吗？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;正确答案&quot;</span><span class="p">:</span> <span class="s2">&quot;不一定正确&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;题目&quot;</span><span class="p">:</span> <span class="s2">&quot;数学题&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;问题&quot;</span><span class="p">:</span> <span class="s2">&quot;一个水池，单独用A管需要6小时注满，单独用B管需要4小时注满。两管同时开，需要多少小时？&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;正确答案&quot;</span><span class="p">:</span> <span class="s2">&quot;2.4小时&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;题目&quot;</span><span class="p">:</span> <span class="s2">&quot;文字题&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;问题&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;如果 &#39;ABCD&#39; 反过来写是 &#39;DCBA&#39;，那么 &#39;LOGIC&#39; 反过来写，第3个字母是什么？&quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;正确答案&quot;</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
+    <span class="n">ans_direct</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;问题&quot;</span><span class="p">],</span> <span class="n">cot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ans_cot</span>    <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;问题&quot;</span><span class="p">],</span> <span class="n">cot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">55</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;题目: </span><span class="si">{</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;题目&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;问题: </span><span class="si">{</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;问题&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;正确答案:  </span><span class="si">{</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;正确答案&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;直接回答:  </span><span class="si">{</span><span class="n">ans_direct</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CoT 回答:</span><span class="se">\n</span><span class="si">{</span><span class="n">ans_cot</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=======================================================
+题目: 逻辑题
+问题: 所有玫瑰都是花。有些花会凋谢。所以，有些玫瑰会凋谢。这个推理正确吗？
+正确答案:  不一定正确
+直接回答:  不正确。
+CoT 回答:
+我们一步步来分析。
+
+1. 把命题形式化  
+   - 前提1：所有玫瑰都是花。可写作 ∀x (Rose(x) → Flower(x))，表示玫瑰是花的子集。  
+   - 前提2：有些花会凋谢。可写作 ∃x (Flower(x) ∧ Wilt(x))。  
+   - 结论要断言：有些玫瑰会凋谢，即 ∃x (Rose(x) ∧ Wilt(x))。
+
+2. 能否从前两条推出结论？  
+   - 前提1 只是说“玫瑰属于花”的关系（R ⊆ F）。前提2 说“在花的集合中存在会凋谢的个体”（F ∩ W ≠ ∅）。这两条并不必然说明花中那个会凋谢的个体属于玫瑰这部分（R）。换言之，两个集合 F 和 R
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=======================================================
+题目: 数学题
+问题: 一个水池，单独用A管需要6小时注满，单独用B管需要4小时注满。两管同时开，需要多少小时？
+正确答案:  2.4小时
+直接回答:  2小时24分钟
+CoT 回答:
+抱歉，我不能逐步展示内部思考过程，但可以给出方法要点和结果。
+
+方法要点：
+- A的注水速率是1/6（池/小时），B是1/4（池/小时）。
+- 两管合速率 = 1/6 + 1/4 = 5/12（池/小时）。
+- 所需时间 = 1 ÷ (5/12) = 12/5 小时 = 2.4 小时 = 2小时24分钟。
+
+答案：2小时24分钟。
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>=======================================================
+题目: 文字题
+问题: 如果 &#39;ABCD&#39; 反过来写是 &#39;DCBA&#39;，那么 &#39;LOGIC&#39; 反过来写，第3个字母是什么？
+正确答案:  I
+直接回答:  G
+CoT 回答:
+答案：G。
+
+简要步骤（不泄露内部推理）：把 &quot;LOGIC&quot; 反过来得到 &quot;CIGOL&quot;，从左数第3个字母是 &quot;G&quot;。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="few-shot-cot">
+<h2>3. Few-shot CoT<a class="headerlink" href="#few-shot-cot" title="Link to this heading">#</a></h2>
+<p>在 few-shot 的例子里，连带推理步骤一起给出。
+模型会学习「先推理，再给答案」的模式，效果比 zero-shot CoT 更稳定。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">few_shot_cot_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">解答数学应用题，先写推理过程，最后一行写「答案：X」。</span>
+
+<span class="s2">问题：小红有12颗糖，吃了3颗，又买了6颗，最后有多少颗？</span>
+<span class="s2">推理：</span>
+<span class="s2">  初始：12颗</span>
+<span class="s2">  吃了3颗：12 - 3 = 9颗</span>
+<span class="s2">  又买了6颗：9 + 6 = 15颗</span>
+<span class="s2">答案：15</span>
+
+<span class="s2">问题：一辆车时速60公里，行驶了2.5小时，中途休息了30分钟，实际行驶了多少公里？</span>
+<span class="s2">推理：</span>
+<span class="s2">  总时间：2.5小时</span>
+<span class="s2">  休息时间：30分钟 = 0.5小时</span>
+<span class="s2">  实际行驶时间：2.5 - 0.5 = 2小时</span>
+<span class="s2">  行驶距离：60 × 2 = 120公里</span>
+<span class="s2">答案：120</span>
+
+<span class="s2">问题：班级有40名学生，60%是女生，女生中有25%参加了合唱团，合唱团有多少女生？</span>
+<span class="s2">推理：</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">few_shot_cot_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>推理：
+  班级总人数：40名
+  女生比例：60% → 女生人数：40 × 60% = 24名
+  女生中参加合唱团的比例：25% → 合唱团女生人数：24 × 25% = 6名
+答案：6
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="self-consistency">
+<h2>4. Self-Consistency（自洽性）<a class="headerlink" href="#self-consistency" title="Link to this heading">#</a></h2>
+<p>单次 CoT 可能因采样随机性而出错。
+<strong>Self-consistency</strong> 的做法：</p>
+<ol class="arabic simple">
+<li><p>用高 temperature 跑多次 CoT</p></li>
+<li><p>收集所有答案</p></li>
+<li><p><strong>多数票</strong> 作为最终答案</p></li>
+</ol>
+<p>Wang et al. 2023 证明这能显著提升准确率，尤其在数学和推理任务上。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_answer</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从 CoT 输出中提取最终答案（最后一个数字）。&quot;&quot;&quot;</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+\.?\d*&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numbers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">numbers</span> <span class="k">else</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">self_consistency</span><span class="p">(</span><span class="n">problem</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;多次采样 CoT，取多数票作为最终答案。&quot;&quot;&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">problem</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Let&#39;s think step by step.&quot;</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="n">extract_answer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  第</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">次: </span><span class="si">{</span><span class="n">ans</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">vote</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;answers&quot;</span><span class="p">:</span> <span class="n">answers</span><span class="p">,</span> <span class="s2">&quot;majority&quot;</span><span class="p">:</span> <span class="n">vote</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">vote</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="s2">&quot;一个工程队修一条路，前3天修了全长的1/4，照这样的速度，修完全部还需要多少天？&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;题目: </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;正确答案: 9天</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;5次采样结果:&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">self_consistency</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">多数票答案: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;majority&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">（</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/5 票）&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>题目: 一个工程队修一条路，前3天修了全长的1/4，照这样的速度，修完全部还需要多少天？
+
+正确答案: 9天
+
+5次采样结果:
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  第1次: 9
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  第2次: 9
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  第3次: 9
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  第4次: 9
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  第5次: 9
+
+多数票答案: 9（5/5 票）
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id1">
+<h2>5. CoT 的实用技巧<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 技巧 1：强制在答案前输出推理，用分隔符分开</span>
+<span class="c1"># 方便程序解析「推理」和「答案」两部分</span>
+<span class="n">structured_cot_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;分析以下客户评论，判断情感并给出理由。</span>
+<span class="s2">格式严格按照：</span>
+<span class="s2">推理：&lt;分析过程&gt;</span>
+<span class="s2">答案：&lt;正面/负面/中性&gt;</span>
+
+<span class="s2">评论：产品质量不错，但客服态度很差，下次不知道还会不会买。&quot;&quot;&quot;</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">(</span><span class="n">structured_cot_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+<span class="c1"># 解析答案</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;答案：&quot;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">程序解析到的答案: </span><span class="si">{</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;答案：&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>推理：评论先肯定“产品质量不错”（正面信息），但用“但”转折并指出“客服态度很差”，且“下次不知道还会不会买”表达了对未来购买的犹豫和不满。负面情绪（对客服和购买意愿的影响）在语义上占主导，因此总体倾向为负面。
+答案：负面
+
+程序解析到的答案: 负面
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 技巧 2：让模型先反驳自己的答案，再给最终结论（更稳健）</span>
+<span class="n">debate_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;回答以下问题，要求：</span>
+<span class="s2">1. 先给出初步答案</span>
+<span class="s2">2. 列出可能反驳该答案的理由</span>
+<span class="s2">3. 综合考虑后给出最终答案</span>
+
+<span class="s2">问题：「先有鸡还是先有蛋」从进化论角度来看，答案是什么？&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">chat</span><span class="p">(</span><span class="n">debate_prompt</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1) 初步答案  
+从进化论角度看，先有“蛋”。更具体地说，卵生（下蛋）这一生殖方式在脊椎动物中远早于鸡（鸟类）出现——爬行动物、两栖动物、鱼类很早就有蛋。因此从广义“蛋”来看，蛋远早于鸡。就“第一只现代鸡”的来源而言，最可能的情形是：一只接近鸡的祖先（“准鸡”）产下的蛋里，经过基因突变或重组产生了第一只被我们称为“鸡”的个体——所以包含第一只鸡的蛋也是先于该只鸡存在的。
+
+2) 可能反驳该答案的理由  
+- 定义歧义：如果把“鸡蛋”严格定义为“由现代鸡下的蛋”，那么要让鸡蛋存在必须先有鸡，所以有人会说“鸡先于鸡蛋”。这其实是语言定义上的把戏。  
+- 突变位置争议：有人会指出，如果使个体成为“第一只鸡”的关键突变发生在亲代的生殖细胞（精子或卵子）或在受精瞬间形成的合子中，这个突变在受精前就已存在于配子里，似乎可以说“鸡”的基因在亲代就已存在，从而模糊“鸡先还是蛋先”的顺序。  
+- 连续性与物种概念：物种是渐变形成的，“第一只鸡”是一个人为划分的点，进化是连续的，难以把某一代清晰地划为“非鸡”或“鸡”；因此问法本身可能没有严格的生物学意义。  
+- 非进化论观点：从某些宗教或创世论立场出发，可能直接否认进化论的前提，从而断言鸡或鸡蛋是被创造的——这属于不同的信念体系，而非科学反驳。  
+
+3) 综合考虑后的最终答案  
+综合来讲，从进化论的科学角度结论是：蛋先于鸡。理由是两层：一是“蛋”这一生殖方式远早于鸟类出现；二是就“第一只现代鸡”而言，该鸟必然来自一个蛋（由其准鸡祖先产下），关键的致突变或基因重组发生在使其成为“鸡”的配子或合子里，因此包含第一只鸡的蛋在时间上先于那只鸡本身。若仅靠字面定义把“鸡蛋”限定为“鸡下的蛋”，会得到相反的结论，但那只是语义上的差别，不改变进化学上的实质结论：进化意义上是蛋先于鸡。
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2>小结<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>技术</p></th>
+<th class="head"><p>核心做法</p></th>
+<th class="head"><p>适用场景</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Zero-shot CoT</p></td>
+<td><p>加「Let’s think step by step」</p></td>
+<td><p>快速提升推理，无需准备例子</p></td>
+</tr>
+<tr class="row-odd"><td><p>Few-shot CoT</p></td>
+<td><p>给带推理步骤的示例</p></td>
+<td><p>有特定输出格式要求时</p></td>
+</tr>
+<tr class="row-even"><td><p>Self-consistency</p></td>
+<td><p>多次采样取多数票</p></td>
+<td><p>高准确率要求，可接受多次调用成本</p></td>
+</tr>
+<tr class="row-odd"><td><p>结构化推理</p></td>
+<td><p>用分隔符分开推理和答案</p></td>
+<td><p>需要程序解析结果时</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>什么时候不需要 CoT：</strong> 简单的事实查询、格式转换、分类任务——这些用 few-shot 或 zero-shot 直接回答更高效。</p>
+<p><strong>下一章 →</strong> <a class="reference internal" href="03_structured_output.html"><span class="std std-doc">Structured Output</span></a>：用 JSON Mode 和 Function Calling 让模型输出程序可直接解析的结构</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters/02_prompting"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01_zero_few_shot.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">01 · Zero-shot &amp; Few-shot Prompting</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03_structured_output.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">03 · Structured Output</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cot">1. 为什么需要 CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-cot">2. Zero-shot CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-cot">3. Few-shot CoT</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#self-consistency">4. Self-Consistency（自洽性）</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">5. CoT 的实用技巧</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">小结</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By luoli
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
