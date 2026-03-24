@@ -24,7 +24,7 @@ html:
 sphinx:
   config:
     copyright: "2026"
-    html_logo: _static/avatar.jpg
+    html_logo: _static/guige.jpg
 
 repository:
   url: https://github.com/luoli523/learn-llm
